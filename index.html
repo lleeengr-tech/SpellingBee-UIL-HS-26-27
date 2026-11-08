@@ -1,0 +1,824 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+ name="viewport"
+ content="width=device-width,initial-scale=1">
+
+<title>
+UIL 26-27 HS Word List
+</title>
+
+<style>
+
+body{
+    font-family:Segoe UI,Arial,sans-serif;
+    background:#f2f2f2;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+}
+
+.section{
+    margin-top:15px;
+    padding:15px;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
+
+.controlRow{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+}
+
+.label{
+    min-width:120px;
+    font-weight:bold;
+}
+
+.inputRow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+#spellInput{
+    flex:1;
+    padding:12px;
+    font-size:22px;
+}
+
+.wideSelect{
+    min-width:400px;
+    padding:8px;
+}
+
+button{
+    padding:10px 15px;
+}
+
+.good{
+    color:green;
+    font-weight:bold;
+}
+
+.bad{
+    color:red;
+    font-weight:bold;
+}
+
+#stats{
+    font-weight:bold;
+}
+
+#wordNumber{
+    font-size:20px;
+    font-weight:bold;
+}
+
+#vocabFlag{
+    color:#006600;
+    margin-top:5px;
+}
+
+#definition{
+    margin-top:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>
+UIL 26-27 HS Word List
+</h1>
+
+<div class="section">
+
+<h2>
+Current Word
+</h2>
+
+<div id="wordNumber">
+Ready
+</div>
+
+<div id="vocabFlag">
+</div>
+
+<br>
+
+<div class="inputRow">
+
+<input
+ id="spellInput"
+ placeholder="Type spelling here">
+
+<button onclick="submitAnswer()">
+Submit
+</button>
+
+</div>
+
+<br>
+
+<div id="result"></div>
+
+<div id="definition"></div>
+
+</div>
+
+
+<div class="section controlRow">
+
+<div class="label">
+Words
+</div>
+
+<div>
+
+<button onclick="repeatWord()">
+Repeat Word (<=)
+</button>
+
+<button onclick="nextWord()">
+Next Word (=>)
+</button>
+
+</div>
+
+</div>
+
+
+<div class="section controlRow">
+
+<div class="label">
+Mode
+</div>
+
+<div>
+
+<button onclick="setMode('random')">
+Random
+</button>
+
+<button onclick="setMode('sequential')">
+Sequential
+</button>
+
+<button onclick="setMode('vocab')">
+Vocabulary
+</button>
+
+<button onclick="setMode('missed')">
+Missed Words
+</button>
+
+</div>
+
+</div>
+
+
+<div class="section controlRow">
+
+<div class="label">
+Range
+</div>
+
+<select
+ id="rangeSelect"
+ onchange="applyRange()">
+
+<option value="all">
+All Words
+</option>
+
+<option value="1-200">1-200</option>
+<option value="201-400">201-400</option>
+<option value="401-600">401-600</option>
+<option value="601-800">601-800</option>
+<option value="801-1000">801-1000</option>
+<option value="1001-1200">1001-1200</option>
+<option value="1201-1400">1201-1400</option>
+<option value="1401-1500">1401-1500</option>
+
+</select>
+
+</div>
+
+
+<div class="section controlRow">
+
+<div class="label">
+Voice
+</div>
+
+<select
+ id="voiceSelect"
+ class="wideSelect">
+</select>
+
+</div>
+
+
+<div class="section">
+
+<h2>
+Statistics
+</h2>
+
+<div id="stats">
+</div>
+
+</div>
+
+
+<div class="section">
+
+<b>Keyboard Shortcuts</b>
+
+<br>
+
+Enter = Submit / Next Word
+
+<br>
+
+→ = Next Word
+
+<br>
+
+← = Repeat Word
+
+</div>
+
+</div>
+
+
+<script>
+
+const ALL_WORDS =
+[{"uilNum": 1, "display": "ab extra •", "acceptable": ["ab extra"], "vocab": false}, {"uilNum": 2, "display": "abalone •", "acceptable": ["abalone"], "vocab": false}, {"uilNum": 3, "display": "abasement", "acceptable": ["abasement"], "vocab": false}, {"uilNum": 4, "display": "abaxial •", "acceptable": ["abaxial"], "vocab": false}, {"uilNum": 5, "display": "abidance •", "acceptable": ["abidance"], "vocab": false}, {"uilNum": 6, "display": "abiological", "acceptable": ["abiological"], "vocab": false}, {"uilNum": 7, "display": "abomasum", "acceptable": ["abomasum"], "vocab": false}, {"uilNum": 8, "display": "abridgment, abridgement", "acceptable": ["abridgment", "abridgement"], "vocab": false}, {"uilNum": 9, "display": "absenteeism", "acceptable": ["absenteeism"], "vocab": false}, {"uilNum": 10, "display": "Abu Dhabi •", "acceptable": ["Abu Dhabi"], "vocab": false}, {"uilNum": 11, "display": "academia", "acceptable": ["academia"], "vocab": false}, {"uilNum": 12, "display": "acarophobia •", "acceptable": ["acarophobia"], "vocab": false}, {"uilNum": 13, "display": "accelerograph", "acceptable": ["accelerograph"], "vocab": false}, {"uilNum": 14, "display": "accountancy", "acceptable": ["accountancy"], "vocab": false}, {"uilNum": 15, "display": "accumulation", "acceptable": ["accumulation"], "vocab": false}, {"uilNum": 16, "display": "acedia", "acceptable": ["acedia"], "vocab": false}, {"uilNum": 17, "display": "acetylene", "acceptable": ["acetylene"], "vocab": false}, {"uilNum": 18, "display": "achromatic", "acceptable": ["achromatic"], "vocab": false}, {"uilNum": 19, "display": "acquisition", "acceptable": ["acquisition"], "vocab": false}, {"uilNum": 20, "display": "acrimony", "acceptable": ["acrimony"], "vocab": false}, {"uilNum": 21, "display": "actionable", "acceptable": ["actionable"], "vocab": false}, {"uilNum": 22, "display": "ad libitum", "acceptable": ["ad libitum"], "vocab": false}, {"uilNum": 23, "display": "adenocarcinoma •", "acceptable": ["adenocarcinoma"], "vocab": false}, {"uilNum": 24, "display": "adiposity", "acceptable": ["adiposity"], "vocab": false}, {"uilNum": 25, "display": "adjacency", "acceptable": ["adjacency"], "vocab": false}, {"uilNum": 26, "display": "adobo", "acceptable": ["adobo"], "vocab": false}, {"uilNum": 27, "display": "adsorbent", "acceptable": ["adsorbent"], "vocab": false}, {"uilNum": 28, "display": "adumbrate", "acceptable": ["adumbrate"], "vocab": false}, {"uilNum": 29, "display": "Adventist", "acceptable": ["Adventist"], "vocab": false}, {"uilNum": 30, "display": "advocacy", "acceptable": ["advocacy"], "vocab": false}, {"uilNum": 31, "display": "aeneous, aeneus", "acceptable": ["aeneous", "aeneus"], "vocab": false}, {"uilNum": 32, "display": "aesthetician, esthetician •", "acceptable": ["aesthetician", "esthetician"], "vocab": false}, {"uilNum": 33, "display": "aggress", "acceptable": ["aggress"], "vocab": false}, {"uilNum": 34, "display": "agnathan", "acceptable": ["agnathan"], "vocab": false}, {"uilNum": 35, "display": "agrarian", "acceptable": ["agrarian"], "vocab": false}, {"uilNum": 36, "display": "ahimsa", "acceptable": ["ahimsa"], "vocab": false}, {"uilNum": 37, "display": "ailurophile", "acceptable": ["ailurophile"], "vocab": false}, {"uilNum": 38, "display": "albescent", "acceptable": ["albescent"], "vocab": false}, {"uilNum": 39, "display": "alfresco, al fresco •", "acceptable": ["alfresco", "al fresco"], "vocab": false}, {"uilNum": 40, "display": "algorithm", "acceptable": ["algorithm"], "vocab": false}, {"uilNum": 41, "display": "allegro", "acceptable": ["allegro"], "vocab": false}, {"uilNum": 42, "display": "aloe vera, Aloe vera", "acceptable": ["aloe vera", "Aloe vera"], "vocab": false}, {"uilNum": 43, "display": "alpaca", "acceptable": ["alpaca"], "vocab": false}, {"uilNum": 44, "display": "al-Qaeda", "acceptable": ["al-Qaeda"], "vocab": false}, {"uilNum": 45, "display": "alto clef", "acceptable": ["alto clef"], "vocab": false}, {"uilNum": 46, "display": "alveolate", "acceptable": ["alveolate"], "vocab": false}, {"uilNum": 47, "display": "amaranthine", "acceptable": ["amaranthine"], "vocab": false}, {"uilNum": 48, "display": "ambient", "acceptable": ["ambient"], "vocab": false}, {"uilNum": 49, "display": "ambivalence", "acceptable": ["ambivalence"], "vocab": false}, {"uilNum": 50, "display": "Amish", "acceptable": ["Amish"], "vocab": false}, {"uilNum": 51, "display": "amorphism", "acceptable": ["amorphism"], "vocab": false}, {"uilNum": 52, "display": "amphibious •", "acceptable": ["amphibious"], "vocab": false}, {"uilNum": 53, "display": "amplexicaul", "acceptable": ["amplexicaul"], "vocab": false}, {"uilNum": 54, "display": "amylaceous •", "acceptable": ["amylaceous"], "vocab": false}, {"uilNum": 55, "display": "anagram", "acceptable": ["anagram"], "vocab": false}, {"uilNum": 56, "display": "anaphora •", "acceptable": ["anaphora"], "vocab": false}, {"uilNum": 57, "display": "anarchic", "acceptable": ["anarchic"], "vocab": false}, {"uilNum": 58, "display": "Anaxagoras", "acceptable": ["Anaxagoras"], "vocab": false}, {"uilNum": 59, "display": "androgynous •", "acceptable": ["androgynous"], "vocab": false}, {"uilNum": 60, "display": "anechoic", "acceptable": ["anechoic"], "vocab": false}, {"uilNum": 61, "display": "Anglicanism", "acceptable": ["Anglicanism"], "vocab": false}, {"uilNum": 62, "display": "animato", "acceptable": ["animato"], "vocab": false}, {"uilNum": 63, "display": "aniseikonia", "acceptable": ["aniseikonia"], "vocab": false}, {"uilNum": 64, "display": "annuity •", "acceptable": ["annuity"], "vocab": false}, {"uilNum": 65, "display": "anomaly •", "acceptable": ["anomaly"], "vocab": false}, {"uilNum": 66, "display": "anonymity •", "acceptable": ["anonymity"], "vocab": false}, {"uilNum": 67, "display": "Antananarivo", "acceptable": ["Antananarivo"], "vocab": false}, {"uilNum": 68, "display": "antechamber", "acceptable": ["antechamber"], "vocab": false}, {"uilNum": 69, "display": "antependium", "acceptable": ["antependium"], "vocab": false}, {"uilNum": 70, "display": "antihero", "acceptable": ["antihero"], "vocab": false}, {"uilNum": 71, "display": "anti-infective", "acceptable": ["anti-infective"], "vocab": false}, {"uilNum": 72, "display": "antipyretic •", "acceptable": ["antipyretic"], "vocab": false}, {"uilNum": 73, "display": "antistrophe", "acceptable": ["antistrophe"], "vocab": false}, {"uilNum": 74, "display": "Apalachicola River", "acceptable": ["Apalachicola River"], "vocab": false}, {"uilNum": 75, "display": "apéritif", "acceptable": ["apéritif"], "vocab": false}, {"uilNum": 76, "display": "apocalypse, Apocalypse", "acceptable": ["apocalypse", "Apocalypse"], "vocab": false}, {"uilNum": 77, "display": "apologia", "acceptable": ["apologia"], "vocab": false}, {"uilNum": 78, "display": "aposiopesis •", "acceptable": ["aposiopesis"], "vocab": false}, {"uilNum": 79, "display": "appanage, apanage", "acceptable": ["appanage", "apanage"], "vocab": false}, {"uilNum": 80, "display": "applicable •", "acceptable": ["applicable"], "vocab": false}, {"uilNum": 81, "display": "approbatory •", "acceptable": ["approbatory"], "vocab": false}, {"uilNum": 82, "display": "aquacade", "acceptable": ["aquacade"], "vocab": false}, {"uilNum": 83, "display": "Aqua-Lung (trademark)", "acceptable": ["Aqua-Lung"], "vocab": false}, {"uilNum": 84, "display": "aquiline", "acceptable": ["aquiline"], "vocab": false}, {"uilNum": 85, "display": "arachnophobia", "acceptable": ["arachnophobia"], "vocab": false}, {"uilNum": 86, "display": "arboriculture", "acceptable": ["arboriculture"], "vocab": false}, {"uilNum": 87, "display": "archipelago", "acceptable": ["archipelago"], "vocab": false}, {"uilNum": 88, "display": "argali (singular)", "acceptable": ["argali"], "vocab": false}, {"uilNum": 89, "display": "argyle, argyll", "acceptable": ["argyle", "argyll"], "vocab": false}, {"uilNum": 90, "display": "Armageddon •", "acceptable": ["Armageddon"], "vocab": false}, {"uilNum": 91, "display": "arroyos", "acceptable": ["arroyos"], "vocab": false}, {"uilNum": 92, "display": "arthropod", "acceptable": ["arthropod"], "vocab": false}, {"uilNum": 93, "display": "asbestosis", "acceptable": ["asbestosis"], "vocab": false}, {"uilNum": 94, "display": "aspiration •", "acceptable": ["aspiration"], "vocab": false}, {"uilNum": 95, "display": "assayer", "acceptable": ["assayer"], "vocab": false}, {"uilNum": 96, "display": "assumptive •", "acceptable": ["assumptive"], "vocab": false}, {"uilNum": 97, "display": "astasia", "acceptable": ["astasia"], "vocab": false}, {"uilNum": 98, "display": "astrogate •", "acceptable": ["astrogate"], "vocab": false}, {"uilNum": 99, "display": "atherosclerosis", "acceptable": ["atherosclerosis"], "vocab": false}, {"uilNum": 100, "display": "atrium", "acceptable": ["atrium"], "vocab": false}, {"uilNum": 101, "display": "au revoir", "acceptable": ["au revoir"], "vocab": false}, {"uilNum": 102, "display": "auger", "acceptable": ["auger"], "vocab": false}, {"uilNum": 103, "display": "aureola", "acceptable": ["aureola"], "vocab": false}, {"uilNum": 104, "display": "auteurism", "acceptable": ["auteurism"], "vocab": false}, {"uilNum": 105, "display": "auxiliary", "acceptable": ["auxiliary"], "vocab": false}, {"uilNum": 106, "display": "aviatrix •", "acceptable": ["aviatrix"], "vocab": false}, {"uilNum": 107, "display": "avocet •", "acceptable": ["avocet"], "vocab": false}, {"uilNum": 108, "display": "axenic •", "acceptable": ["axenic"], "vocab": false}, {"uilNum": 109, "display": "axiomatic", "acceptable": ["axiomatic"], "vocab": false}, {"uilNum": 110, "display": "Baalbek •", "acceptable": ["Baalbek"], "vocab": false}, {"uilNum": 111, "display": "babushka", "acceptable": ["babushka"], "vocab": false}, {"uilNum": 112, "display": "baby boomer", "acceptable": ["baby boomer"], "vocab": false}, {"uilNum": 113, "display": "backpedal", "acceptable": ["backpedal"], "vocab": false}, {"uilNum": 114, "display": "bacteriogenous", "acceptable": ["bacteriogenous"], "vocab": false}, {"uilNum": 115, "display": "baguette •", "acceptable": ["baguette"], "vocab": false}, {"uilNum": 116, "display": "balata •", "acceptable": ["balata"], "vocab": false}, {"uilNum": 117, "display": "ballade", "acceptable": ["ballade"], "vocab": false}, {"uilNum": 118, "display": "ballonet •", "acceptable": ["ballonet"], "vocab": false}, {"uilNum": 119, "display": "ball-peen hammer", "acceptable": ["ball-peen hammer"], "vocab": false}, {"uilNum": 120, "display": "Baltic States", "acceptable": ["Baltic States"], "vocab": false}, {"uilNum": 121, "display": "banquette", "acceptable": ["banquette"], "vocab": false}, {"uilNum": 122, "display": "banzai attack", "acceptable": ["banzai attack"], "vocab": false}, {"uilNum": 123, "display": "bar-le-duc, Bar-le-Duc", "acceptable": ["bar-le-duc", "Bar-le-Duc"], "vocab": false}, {"uilNum": 124, "display": "bascule •", "acceptable": ["bascule"], "vocab": false}, {"uilNum": 125, "display": "Basilicata", "acceptable": ["Basilicata"], "vocab": false}, {"uilNum": 126, "display": "batik •", "acceptable": ["batik"], "vocab": false}, {"uilNum": 127, "display": "batophobia", "acceptable": ["batophobia"], "vocab": false}, {"uilNum": 128, "display": "Beau Brummell", "acceptable": ["Beau Brummell"], "vocab": false}, {"uilNum": 129, "display": "beauteous", "acceptable": ["beauteous"], "vocab": false}, {"uilNum": 130, "display": "beefalo", "acceptable": ["beefalo"], "vocab": false}, {"uilNum": 131, "display": "Beguine", "acceptable": ["Beguine"], "vocab": false}, {"uilNum": 132, "display": "beignet •", "acceptable": ["beignet"], "vocab": false}, {"uilNum": 133, "display": "belles-lettres", "acceptable": ["belles-lettres"], "vocab": false}, {"uilNum": 134, "display": "bemusement", "acceptable": ["bemusement"], "vocab": false}, {"uilNum": 135, "display": "benignities", "acceptable": ["benignities"], "vocab": false}, {"uilNum": 136, "display": "beryllium •", "acceptable": ["beryllium"], "vocab": false}, {"uilNum": 137, "display": "bête noire", "acceptable": ["bête noire"], "vocab": false}, {"uilNum": 138, "display": "bezique", "acceptable": ["bezique"], "vocab": false}, {"uilNum": 139, "display": "biannually", "acceptable": ["biannually"], "vocab": false}, {"uilNum": 140, "display": "bibliophile", "acceptable": ["bibliophile"], "vocab": false}, {"uilNum": 141, "display": "biflagellate", "acceptable": ["biflagellate"], "vocab": false}, {"uilNum": 142, "display": "bifunctional", "acceptable": ["bifunctional"], "vocab": false}, {"uilNum": 143, "display": "billet-doux", "acceptable": ["billet-doux"], "vocab": false}, {"uilNum": 144, "display": "bindlestiff", "acceptable": ["bindlestiff"], "vocab": false}, {"uilNum": 145, "display": "biodegradation", "acceptable": ["biodegradation"], "vocab": false}, {"uilNum": 146, "display": "bioethicist", "acceptable": ["bioethicist"], "vocab": false}, {"uilNum": 147, "display": "biretta, beretta", "acceptable": ["biretta", "beretta"], "vocab": false}, {"uilNum": 148, "display": "blepharitis •", "acceptable": ["blepharitis"], "vocab": false}, {"uilNum": 149, "display": "bombardier", "acceptable": ["bombardier"], "vocab": false}, {"uilNum": 150, "display": "bookkeeping", "acceptable": ["bookkeeping"], "vocab": false}, {"uilNum": 151, "display": "bootlicker", "acceptable": ["bootlicker"], "vocab": false}, {"uilNum": 152, "display": "bothrodesy", "acceptable": ["bothrodesy"], "vocab": false}, {"uilNum": 153, "display": "bouldering", "acceptable": ["bouldering"], "vocab": false}, {"uilNum": 154, "display": "bradycardia", "acceptable": ["bradycardia"], "vocab": false}, {"uilNum": 155, "display": "brandish •", "acceptable": ["brandish"], "vocab": false}, {"uilNum": 156, "display": "brave new world", "acceptable": ["brave new world"], "vocab": false}, {"uilNum": 157, "display": "bravoing", "acceptable": ["bravoing"], "vocab": false}, {"uilNum": 158, "display": "brevetcy", "acceptable": ["brevetcy"], "vocab": false}, {"uilNum": 159, "display": "briarroot", "acceptable": ["briarroot"], "vocab": false}, {"uilNum": 160, "display": "brioche", "acceptable": ["brioche"], "vocab": false}, {"uilNum": 161, "display": "broncobuster", "acceptable": ["broncobuster"], "vocab": false}, {"uilNum": 162, "display": "broomcorn", "acceptable": ["broomcorn"], "vocab": false}, {"uilNum": 163, "display": "brumal •", "acceptable": ["brumal"], "vocab": false}, {"uilNum": 164, "display": "bucolic •", "acceptable": ["bucolic"], "vocab": false}, {"uilNum": 165, "display": "bumptious", "acceptable": ["bumptious"], "vocab": false}, {"uilNum": 166, "display": "Bunsen burner", "acceptable": ["Bunsen burner"], "vocab": false}, {"uilNum": 167, "display": "burgage", "acceptable": ["burgage"], "vocab": false}, {"uilNum": 168, "display": "burlesque", "acceptable": ["burlesque"], "vocab": false}, {"uilNum": 169, "display": "cabaletta", "acceptable": ["cabaletta"], "vocab": false}, {"uilNum": 170, "display": "cacique", "acceptable": ["cacique"], "vocab": false}, {"uilNum": 171, "display": "Caddo", "acceptable": ["Caddo"], "vocab": false}, {"uilNum": 172, "display": "Calabria", "acceptable": ["Calabria"], "vocab": false}, {"uilNum": 173, "display": "calcaneum", "acceptable": ["calcaneum"], "vocab": false}, {"uilNum": 174, "display": "calipash", "acceptable": ["calipash"], "vocab": false}, {"uilNum": 175, "display": "callosity", "acceptable": ["callosity"], "vocab": false}, {"uilNum": 176, "display": "caloreceptor", "acceptable": ["caloreceptor"], "vocab": false}, {"uilNum": 177, "display": "campanology", "acceptable": ["campanology"], "vocab": false}, {"uilNum": 178, "display": "camporee", "acceptable": ["camporee"], "vocab": false}, {"uilNum": 179, "display": "canescent •", "acceptable": ["canescent"], "vocab": false}, {"uilNum": 180, "display": "cannonry", "acceptable": ["cannonry"], "vocab": false}, {"uilNum": 181, "display": "cantabile", "acceptable": ["cantabile"], "vocab": false}, {"uilNum": 182, "display": "capillary", "acceptable": ["capillary"], "vocab": false}, {"uilNum": 183, "display": "capriciousness •", "acceptable": ["capriciousness"], "vocab": false}, {"uilNum": 184, "display": "caravel, caravelle", "acceptable": ["caravel", "caravelle"], "vocab": false}, {"uilNum": 185, "display": "Carboniferous, carboniferous", "acceptable": ["Carboniferous", "carboniferous"], "vocab": false}, {"uilNum": 186, "display": "carillon •", "acceptable": ["carillon"], "vocab": false}, {"uilNum": 187, "display": "carotenoid", "acceptable": ["carotenoid"], "vocab": false}, {"uilNum": 188, "display": "carping (adj)", "acceptable": ["carping"], "vocab": false}, {"uilNum": 189, "display": "cartography", "acceptable": ["cartography"], "vocab": false}, {"uilNum": 190, "display": "caryatid", "acceptable": ["caryatid"], "vocab": false}, {"uilNum": 191, "display": "cashier’s check", "acceptable": ["cashier’s check"], "vocab": false}, {"uilNum": 192, "display": "catacomb", "acceptable": ["catacomb"], "vocab": false}, {"uilNum": 193, "display": "catalogue raisonné (singular)", "acceptable": ["catalogue raisonné"], "vocab": false}, {"uilNum": 194, "display": "cathexis", "acceptable": ["cathexis"], "vocab": false}, {"uilNum": 195, "display": "cavalcade", "acceptable": ["cavalcade"], "vocab": false}, {"uilNum": 196, "display": "cavatelli", "acceptable": ["cavatelli"], "vocab": false}, {"uilNum": 197, "display": "caviar, caviare", "acceptable": ["caviar", "caviare"], "vocab": false}, {"uilNum": 198, "display": "cedilla", "acceptable": ["cedilla"], "vocab": false}, {"uilNum": 199, "display": "celebrant •", "acceptable": ["celebrant"], "vocab": false}, {"uilNum": 200, "display": "censorious •", "acceptable": ["censorious"], "vocab": false}, {"uilNum": 201, "display": "Centaurus", "acceptable": ["Centaurus"], "vocab": false}, {"uilNum": 202, "display": "ceraceous", "acceptable": ["ceraceous"], "vocab": false}, {"uilNum": 203, "display": "cerebrospinal", "acceptable": ["cerebrospinal"], "vocab": false}, {"uilNum": 204, "display": "cerise", "acceptable": ["cerise"], "vocab": false}, {"uilNum": 205, "display": "cerulean •", "acceptable": ["cerulean"], "vocab": false}, {"uilNum": 206, "display": "chagrined", "acceptable": ["chagrined"], "vocab": false}, {"uilNum": 207, "display": "Chalcolithic", "acceptable": ["Chalcolithic"], "vocab": false}, {"uilNum": 208, "display": "Champs Élysées", "acceptable": ["Champs Élysées"], "vocab": false}, {"uilNum": 209, "display": "changeover", "acceptable": ["changeover"], "vocab": false}, {"uilNum": 210, "display": "charismatic •", "acceptable": ["charismatic"], "vocab": false}, {"uilNum": 211, "display": "charm quark", "acceptable": ["charm quark"], "vocab": false}, {"uilNum": 212, "display": "chasseur •", "acceptable": ["chasseur"], "vocab": false}, {"uilNum": 213, "display": "chatelaine", "acceptable": ["chatelaine"], "vocab": false}, {"uilNum": 214, "display": "chelicera", "acceptable": ["chelicera"], "vocab": false}, {"uilNum": 215, "display": "chevalier", "acceptable": ["chevalier"], "vocab": false}, {"uilNum": 216, "display": "chichi", "acceptable": ["chichi"], "vocab": false}, {"uilNum": 217, "display": "Chickamauga", "acceptable": ["Chickamauga"], "vocab": false}, {"uilNum": 218, "display": "Chimera, Chimaera (monster)", "acceptable": ["Chimera", "Chimaera"], "vocab": false}, {"uilNum": 219, "display": "choler •", "acceptable": ["choler"], "vocab": false}, {"uilNum": 220, "display": "chondroma", "acceptable": ["chondroma"], "vocab": false}, {"uilNum": 221, "display": "Christology", "acceptable": ["Christology"], "vocab": false}, {"uilNum": 222, "display": "chronometer", "acceptable": ["chronometer"], "vocab": false}, {"uilNum": 223, "display": "Churrigueresque", "acceptable": ["Churrigueresque"], "vocab": false}, {"uilNum": 224, "display": "ciabatta", "acceptable": ["ciabatta"], "vocab": false}, {"uilNum": 225, "display": "cilia •", "acceptable": ["cilia"], "vocab": false}, {"uilNum": 226, "display": "cinematography", "acceptable": ["cinematography"], "vocab": false}, {"uilNum": 227, "display": "cinquain", "acceptable": ["cinquain"], "vocab": false}, {"uilNum": 228, "display": "circumterrestrial •", "acceptable": ["circumterrestrial"], "vocab": false}, {"uilNum": 229, "display": "cirrhotic", "acceptable": ["cirrhotic"], "vocab": false}, {"uilNum": 230, "display": "clamminess", "acceptable": ["clamminess"], "vocab": false}, {"uilNum": 231, "display": "clarion", "acceptable": ["clarion"], "vocab": false}, {"uilNum": 232, "display": "claymore", "acceptable": ["claymore"], "vocab": false}, {"uilNum": 233, "display": "cloche •", "acceptable": ["cloche"], "vocab": false}, {"uilNum": 234, "display": "cloven-footed", "acceptable": ["cloven-footed"], "vocab": false}, {"uilNum": 235, "display": "cobelligerent", "acceptable": ["cobelligerent"], "vocab": false}, {"uilNum": 236, "display": "cockatoo", "acceptable": ["cockatoo"], "vocab": false}, {"uilNum": 237, "display": "codeine •", "acceptable": ["codeine"], "vocab": false}, {"uilNum": 238, "display": "coetaneous", "acceptable": ["coetaneous"], "vocab": false}, {"uilNum": 239, "display": "cognate", "acceptable": ["cognate"], "vocab": false}, {"uilNum": 240, "display": "cold-eyed", "acceptable": ["cold-eyed"], "vocab": false}, {"uilNum": 241, "display": "coleopterous", "acceptable": ["coleopterous"], "vocab": false}, {"uilNum": 242, "display": "collaborationist •", "acceptable": ["collaborationist"], "vocab": false}, {"uilNum": 243, "display": "colliery •", "acceptable": ["colliery"], "vocab": false}, {"uilNum": 244, "display": "colossus •", "acceptable": ["colossus"], "vocab": false}, {"uilNum": 245, "display": "comatose", "acceptable": ["comatose"], "vocab": false}, {"uilNum": 246, "display": "comeuppance", "acceptable": ["comeuppance"], "vocab": false}, {"uilNum": 247, "display": "commissar", "acceptable": ["commissar"], "vocab": false}, {"uilNum": 248, "display": "commutative", "acceptable": ["commutative"], "vocab": false}, {"uilNum": 249, "display": "compendious", "acceptable": ["compendious"], "vocab": false}, {"uilNum": 250, "display": "complicacy", "acceptable": ["complicacy"], "vocab": false}, {"uilNum": 251, "display": "comportment •", "acceptable": ["comportment"], "vocab": false}, {"uilNum": 252, "display": "compunction", "acceptable": ["compunction"], "vocab": false}, {"uilNum": 253, "display": "conchoidal •", "acceptable": ["conchoidal"], "vocab": false}, {"uilNum": 254, "display": "conciliatory •", "acceptable": ["conciliatory"], "vocab": false}, {"uilNum": 255, "display": "concourse", "acceptable": ["concourse"], "vocab": false}, {"uilNum": 256, "display": "condign", "acceptable": ["condign"], "vocab": false}, {"uilNum": 257, "display": "conduit •", "acceptable": ["conduit"], "vocab": false}, {"uilNum": 258, "display": "conglobate •", "acceptable": ["conglobate"], "vocab": false}, {"uilNum": 259, "display": "congregant", "acceptable": ["congregant"], "vocab": false}, {"uilNum": 260, "display": "conjugate", "acceptable": ["conjugate"], "vocab": false}, {"uilNum": 261, "display": "connectivity", "acceptable": ["connectivity"], "vocab": false}, {"uilNum": 262, "display": "Connemara", "acceptable": ["Connemara"], "vocab": false}, {"uilNum": 263, "display": "constituency •", "acceptable": ["constituency"], "vocab": false}, {"uilNum": 264, "display": "consubstantial", "acceptable": ["consubstantial"], "vocab": false}, {"uilNum": 265, "display": "contextual", "acceptable": ["contextual"], "vocab": false}, {"uilNum": 266, "display": "contingent", "acceptable": ["contingent"], "vocab": false}, {"uilNum": 267, "display": "contradistinguish", "acceptable": ["contradistinguish"], "vocab": false}, {"uilNum": 268, "display": "contumelious", "acceptable": ["contumelious"], "vocab": false}, {"uilNum": 269, "display": "convoy", "acceptable": ["convoy"], "vocab": false}, {"uilNum": 270, "display": "convulsion", "acceptable": ["convulsion"], "vocab": false}, {"uilNum": 271, "display": "copyrightable", "acceptable": ["copyrightable"], "vocab": false}, {"uilNum": 272, "display": "Corcovado", "acceptable": ["Corcovado"], "vocab": false}, {"uilNum": 273, "display": "coriander", "acceptable": ["coriander"], "vocab": false}, {"uilNum": 274, "display": "corneal", "acceptable": ["corneal"], "vocab": false}, {"uilNum": 275, "display": "corollary", "acceptable": ["corollary"], "vocab": false}, {"uilNum": 276, "display": "corpus callosum •", "acceptable": ["corpus callosum"], "vocab": false}, {"uilNum": 277, "display": "cortege, cortège", "acceptable": ["cortege", "cortège"], "vocab": false}, {"uilNum": 278, "display": "coulee", "acceptable": ["coulee"], "vocab": false}, {"uilNum": 279, "display": "countercharge", "acceptable": ["countercharge"], "vocab": false}, {"uilNum": 280, "display": "counterpoise •", "acceptable": ["counterpoise"], "vocab": false}, {"uilNum": 281, "display": "crape myrtle, crepe myrtle", "acceptable": ["crape myrtle", "crepe myrtle"], "vocab": false}, {"uilNum": 282, "display": "creditable", "acceptable": ["creditable"], "vocab": false}, {"uilNum": 283, "display": "crêpes suzette (singular)", "acceptable": ["crêpes suzette"], "vocab": false}, {"uilNum": 284, "display": "crepitate •", "acceptable": ["crepitate"], "vocab": false}, {"uilNum": 285, "display": "cribbage •", "acceptable": ["cribbage"], "vocab": false}, {"uilNum": 286, "display": "criminology", "acceptable": ["criminology"], "vocab": false}, {"uilNum": 287, "display": "crocodilian", "acceptable": ["crocodilian"], "vocab": false}, {"uilNum": 288, "display": "croquet", "acceptable": ["croquet"], "vocab": false}, {"uilNum": 289, "display": "crouton", "acceptable": ["crouton"], "vocab": false}, {"uilNum": 290, "display": "cryptically", "acceptable": ["cryptically"], "vocab": false}, {"uilNum": 291, "display": "cultivator", "acceptable": ["cultivator"], "vocab": false}, {"uilNum": 292, "display": "cupidity •", "acceptable": ["cupidity"], "vocab": false}, {"uilNum": 293, "display": "curlicue, curlycue", "acceptable": ["curlicue", "curlycue"], "vocab": false}, {"uilNum": 294, "display": "cursory •", "acceptable": ["cursory"], "vocab": false}, {"uilNum": 295, "display": "custodial", "acceptable": ["custodial"], "vocab": false}, {"uilNum": 296, "display": "cuttlefish •", "acceptable": ["cuttlefish"], "vocab": false}, {"uilNum": 297, "display": "cyclamen, Cyclamen", "acceptable": ["cyclamen", "Cyclamen"], "vocab": false}, {"uilNum": 298, "display": "czarina, tsarina •", "acceptable": ["czarina", "tsarina"], "vocab": false}, {"uilNum": 299, "display": "Daedalus", "acceptable": ["Daedalus"], "vocab": false}, {"uilNum": 300, "display": "Dallis grass", "acceptable": ["Dallis grass"], "vocab": false}, {"uilNum": 301, "display": "danseuse", "acceptable": ["danseuse"], "vocab": false}, {"uilNum": 302, "display": "Darfur •", "acceptable": ["Darfur"], "vocab": false}, {"uilNum": 303, "display": "data processor", "acceptable": ["data processor"], "vocab": false}, {"uilNum": 304, "display": "daughters-in-law", "acceptable": ["daughters-in-law"], "vocab": false}, {"uilNum": 305, "display": "de Stijl", "acceptable": ["de Stijl"], "vocab": false}, {"uilNum": 306, "display": "dealcoholize", "acceptable": ["dealcoholize"], "vocab": false}, {"uilNum": 307, "display": "decalescence", "acceptable": ["decalescence"], "vocab": false}, {"uilNum": 308, "display": "decathlon", "acceptable": ["decathlon"], "vocab": false}, {"uilNum": 309, "display": "decedent", "acceptable": ["decedent"], "vocab": false}, {"uilNum": 310, "display": "decennium •", "acceptable": ["decennium"], "vocab": false}, {"uilNum": 311, "display": "déclassé", "acceptable": ["déclassé"], "vocab": false}, {"uilNum": 312, "display": "decongestive", "acceptable": ["decongestive"], "vocab": false}, {"uilNum": 313, "display": "decoyed", "acceptable": ["decoyed"], "vocab": false}, {"uilNum": 314, "display": "dedifferentiation", "acceptable": ["dedifferentiation"], "vocab": false}, {"uilNum": 315, "display": "defeasible", "acceptable": ["defeasible"], "vocab": false}, {"uilNum": 316, "display": "defilement", "acceptable": ["defilement"], "vocab": false}, {"uilNum": 317, "display": "dégagé", "acceptable": ["dégagé"], "vocab": false}, {"uilNum": 318, "display": "deglamorize", "acceptable": ["deglamorize"], "vocab": false}, {"uilNum": 319, "display": "dehisce •", "acceptable": ["dehisce"], "vocab": false}, {"uilNum": 320, "display": "delamination •", "acceptable": ["delamination"], "vocab": false}, {"uilNum": 321, "display": "delegitimize", "acceptable": ["delegitimize"], "vocab": false}, {"uilNum": 322, "display": "deltiology", "acceptable": ["deltiology"], "vocab": false}, {"uilNum": 323, "display": "demagnetize", "acceptable": ["demagnetize"], "vocab": false}, {"uilNum": 324, "display": "demitasse •", "acceptable": ["demitasse"], "vocab": false}, {"uilNum": 325, "display": "demographics", "acceptable": ["demographics"], "vocab": false}, {"uilNum": 326, "display": "demotic, Demotic", "acceptable": ["demotic", "Demotic"], "vocab": true}, {"uilNum": 327, "display": "dendrology", "acceptable": ["dendrology"], "vocab": false}, {"uilNum": 328, "display": "denticular", "acceptable": ["denticular"], "vocab": false}, {"uilNum": 329, "display": "depersonalize", "acceptable": ["depersonalize"], "vocab": false}, {"uilNum": 330, "display": "deplete", "acceptable": ["deplete"], "vocab": false}, {"uilNum": 331, "display": "deregulation", "acceptable": ["deregulation"], "vocab": false}, {"uilNum": 332, "display": "dermatoplasty •", "acceptable": ["dermatoplasty"], "vocab": false}, {"uilNum": 333, "display": "descrambler", "acceptable": ["descrambler"], "vocab": false}, {"uilNum": 334, "display": "desiccant •", "acceptable": ["desiccant"], "vocab": false}, {"uilNum": 335, "display": "desiderate", "acceptable": ["desiderate"], "vocab": false}, {"uilNum": 336, "display": "despotism", "acceptable": ["despotism"], "vocab": false}, {"uilNum": 337, "display": "detinue •", "acceptable": ["detinue"], "vocab": false}, {"uilNum": 338, "display": "detonation", "acceptable": ["detonation"], "vocab": false}, {"uilNum": 339, "display": "development", "acceptable": ["development"], "vocab": false}, {"uilNum": 340, "display": "dewlap", "acceptable": ["dewlap"], "vocab": false}, {"uilNum": 341, "display": "dialogue, dialog", "acceptable": ["dialogue", "dialog"], "vocab": false}, {"uilNum": 342, "display": "dicephalous •", "acceptable": ["dicephalous"], "vocab": false}, {"uilNum": 343, "display": "dieresis, diaeresis •", "acceptable": ["dieresis", "diaeresis"], "vocab": false}, {"uilNum": 344, "display": "digitalis, Digitalis", "acceptable": ["digitalis", "Digitalis"], "vocab": false}, {"uilNum": 345, "display": "Dijon", "acceptable": ["Dijon"], "vocab": false}, {"uilNum": 346, "display": "diocese", "acceptable": ["diocese"], "vocab": false}, {"uilNum": 347, "display": "diplomatic immunity", "acceptable": ["diplomatic immunity"], "vocab": false}, {"uilNum": 348, "display": "disambiguate", "acceptable": ["disambiguate"], "vocab": false}, {"uilNum": 349, "display": "disapprobation", "acceptable": ["disapprobation"], "vocab": false}, {"uilNum": 350, "display": "disclaimer •", "acceptable": ["disclaimer"], "vocab": false}, {"uilNum": 351, "display": "discommoded •", "acceptable": ["discommoded"], "vocab": false}, {"uilNum": 352, "display": "discrepancy", "acceptable": ["discrepancy"], "vocab": false}, {"uilNum": 353, "display": "disinherit", "acceptable": ["disinherit"], "vocab": false}, {"uilNum": 354, "display": "dispassionate", "acceptable": ["dispassionate"], "vocab": false}, {"uilNum": 355, "display": "dispossessed", "acceptable": ["dispossessed"], "vocab": false}, {"uilNum": 356, "display": "dissension •", "acceptable": ["dissension"], "vocab": false}, {"uilNum": 357, "display": "dissidence", "acceptable": ["dissidence"], "vocab": false}, {"uilNum": 358, "display": "distaff", "acceptable": ["distaff"], "vocab": false}, {"uilNum": 359, "display": "distinguishable", "acceptable": ["distinguishable"], "vocab": false}, {"uilNum": 360, "display": "divertissement", "acceptable": ["divertissement"], "vocab": false}, {"uilNum": 361, "display": "divorcé (male)", "acceptable": ["divorcé"], "vocab": false}, {"uilNum": 362, "display": "Dixieland •", "acceptable": ["Dixieland"], "vocab": false}, {"uilNum": 363, "display": "Dobro (trademark)", "acceptable": ["Dobro"], "vocab": false}, {"uilNum": 364, "display": "dogmatism", "acceptable": ["dogmatism"], "vocab": false}, {"uilNum": 365, "display": "Donatello", "acceptable": ["Donatello"], "vocab": false}, {"uilNum": 366, "display": "double indemnity", "acceptable": ["double indemnity"], "vocab": false}, {"uilNum": 367, "display": "draconic", "acceptable": ["draconic"], "vocab": false}, {"uilNum": 368, "display": "dragée •", "acceptable": ["dragée"], "vocab": false}, {"uilNum": 369, "display": "dramaturge", "acceptable": ["dramaturge"], "vocab": false}, {"uilNum": 370, "display": "drugget •", "acceptable": ["drugget"], "vocab": false}, {"uilNum": 371, "display": "dubitable •", "acceptable": ["dubitable"], "vocab": false}, {"uilNum": 372, "display": "duroc, Duroc", "acceptable": ["duroc", "Duroc"], "vocab": false}, {"uilNum": 373, "display": "durum", "acceptable": ["durum"], "vocab": false}, {"uilNum": 374, "display": "dybbuk", "acceptable": ["dybbuk"], "vocab": false}, {"uilNum": 375, "display": "dysgraphia", "acceptable": ["dysgraphia"], "vocab": false}, {"uilNum": 376, "display": "dystopia", "acceptable": ["dystopia"], "vocab": false}, {"uilNum": 377, "display": "early warning system", "acceptable": ["early warning system"], "vocab": false}, {"uilNum": 378, "display": "ecesis", "acceptable": ["ecesis"], "vocab": false}, {"uilNum": 379, "display": "echidna", "acceptable": ["echidna"], "vocab": false}, {"uilNum": 380, "display": "eclosion", "acceptable": ["eclosion"], "vocab": false}, {"uilNum": 381, "display": "écorché •", "acceptable": ["écorché"], "vocab": false}, {"uilNum": 382, "display": "ectothermic", "acceptable": ["ectothermic"], "vocab": false}, {"uilNum": 383, "display": "edentate", "acceptable": ["edentate"], "vocab": false}, {"uilNum": 384, "display": "edification •", "acceptable": ["edification"], "vocab": false}, {"uilNum": 385, "display": "effendi", "acceptable": ["effendi"], "vocab": false}, {"uilNum": 386, "display": "efflorescence", "acceptable": ["efflorescence"], "vocab": false}, {"uilNum": 387, "display": "effusive", "acceptable": ["effusive"], "vocab": false}, {"uilNum": 388, "display": "egotism", "acceptable": ["egotism"], "vocab": false}, {"uilNum": 389, "display": "ehrlichiosis", "acceptable": ["ehrlichiosis"], "vocab": false}, {"uilNum": 390, "display": "eland •", "acceptable": ["eland"], "vocab": false}, {"uilNum": 391, "display": "electorate •", "acceptable": ["electorate"], "vocab": false}, {"uilNum": 392, "display": "electroshock", "acceptable": ["electroshock"], "vocab": false}, {"uilNum": 393, "display": "Elizabethan", "acceptable": ["Elizabethan"], "vocab": false}, {"uilNum": 394, "display": "Elysian", "acceptable": ["Elysian"], "vocab": false}, {"uilNum": 395, "display": "embarkation", "acceptable": ["embarkation"], "vocab": false}, {"uilNum": 396, "display": "embellishment", "acceptable": ["embellishment"], "vocab": false}, {"uilNum": 397, "display": "embouchure", "acceptable": ["embouchure"], "vocab": false}, {"uilNum": 398, "display": "emendation", "acceptable": ["emendation"], "vocab": false}, {"uilNum": 399, "display": "emmetropia •", "acceptable": ["emmetropia"], "vocab": false}, {"uilNum": 400, "display": "empyrean", "acceptable": ["empyrean"], "vocab": false}, {"uilNum": 401, "display": "emulous", "acceptable": ["emulous"], "vocab": false}, {"uilNum": 402, "display": "en masse •", "acceptable": ["en masse"], "vocab": false}, {"uilNum": 403, "display": "en passant", "acceptable": ["en passant"], "vocab": false}, {"uilNum": 404, "display": "enchiridion", "acceptable": ["enchiridion"], "vocab": false}, {"uilNum": 405, "display": "endogamy", "acceptable": ["endogamy"], "vocab": false}, {"uilNum": 406, "display": "enfant terrible (singular) •", "acceptable": ["enfant terrible"], "vocab": false}, {"uilNum": 407, "display": "entablature", "acceptable": ["entablature"], "vocab": false}, {"uilNum": 408, "display": "entombment", "acceptable": ["entombment"], "vocab": false}, {"uilNum": 409, "display": "entomophagous •", "acceptable": ["entomophagous"], "vocab": false}, {"uilNum": 410, "display": "enumerate", "acceptable": ["enumerate"], "vocab": false}, {"uilNum": 411, "display": "eosinophil", "acceptable": ["eosinophil"], "vocab": false}, {"uilNum": 412, "display": "ephemeral •", "acceptable": ["ephemeral"], "vocab": false}, {"uilNum": 413, "display": "epigone", "acceptable": ["epigone"], "vocab": false}, {"uilNum": 414, "display": "epinephrine, epinephrin •", "acceptable": ["epinephrine", "epinephrin"], "vocab": false}, {"uilNum": 415, "display": "epistemology", "acceptable": ["epistemology"], "vocab": false}, {"uilNum": 416, "display": "epizootic", "acceptable": ["epizootic"], "vocab": false}, {"uilNum": 417, "display": "equiponderate", "acceptable": ["equiponderate"], "vocab": false}, {"uilNum": 418, "display": "errhine", "acceptable": ["errhine"], "vocab": false}, {"uilNum": 419, "display": "erythrocytometer", "acceptable": ["erythrocytometer"], "vocab": false}, {"uilNum": 420, "display": "escapement", "acceptable": ["escapement"], "vocab": false}, {"uilNum": 421, "display": "escheatage", "acceptable": ["escheatage"], "vocab": false}, {"uilNum": 422, "display": "Esperanto", "acceptable": ["Esperanto"], "vocab": false}, {"uilNum": 423, "display": "estaminet •", "acceptable": ["estaminet"], "vocab": false}, {"uilNum": 424, "display": "ethnohistory", "acceptable": ["ethnohistory"], "vocab": false}, {"uilNum": 425, "display": "étui", "acceptable": ["étui"], "vocab": false}, {"uilNum": 426, "display": "euphemize •", "acceptable": ["euphemize"], "vocab": false}, {"uilNum": 427, "display": "Euphrates", "acceptable": ["Euphrates"], "vocab": false}, {"uilNum": 428, "display": "eurythmics, eurhythmics", "acceptable": ["eurythmics", "eurhythmics"], "vocab": false}, {"uilNum": 429, "display": "evasiveness •", "acceptable": ["evasiveness"], "vocab": false}, {"uilNum": 430, "display": "Everyman, everyman", "acceptable": ["Everyman", "everyman"], "vocab": false}, {"uilNum": 431, "display": "ex parte", "acceptable": ["ex parte"], "vocab": false}, {"uilNum": 432, "display": "excaudate", "acceptable": ["excaudate"], "vocab": false}, {"uilNum": 433, "display": "excision", "acceptable": ["excision"], "vocab": false}, {"uilNum": 434, "display": "executive privilege", "acceptable": ["executive privilege"], "vocab": false}, {"uilNum": 435, "display": "exegetic •", "acceptable": ["exegetic"], "vocab": false}, {"uilNum": 436, "display": "exemptible", "acceptable": ["exemptible"], "vocab": false}, {"uilNum": 437, "display": "exophthalmos, exophthalmus", "acceptable": ["exophthalmos", "exophthalmus"], "vocab": false}, {"uilNum": 438, "display": "expiate", "acceptable": ["expiate"], "vocab": false}, {"uilNum": 439, "display": "explicitness •", "acceptable": ["explicitness"], "vocab": false}, {"uilNum": 440, "display": "expropriate", "acceptable": ["expropriate"], "vocab": false}, {"uilNum": 441, "display": "expurgation •", "acceptable": ["expurgation"], "vocab": false}, {"uilNum": 442, "display": "exsiccate", "acceptable": ["exsiccate"], "vocab": false}, {"uilNum": 443, "display": "extant •", "acceptable": ["extant"], "vocab": false}, {"uilNum": 444, "display": "extraconstitutional", "acceptable": ["extraconstitutional"], "vocab": false}, {"uilNum": 445, "display": "extremist •", "acceptable": ["extremist"], "vocab": false}, {"uilNum": 446, "display": "eyespot", "acceptable": ["eyespot"], "vocab": false}, {"uilNum": 447, "display": "factotum", "acceptable": ["factotum"], "vocab": false}, {"uilNum": 448, "display": "faena", "acceptable": ["faena"], "vocab": false}, {"uilNum": 449, "display": "fajita", "acceptable": ["fajita"], "vocab": false}, {"uilNum": 450, "display": "falchion", "acceptable": ["falchion"], "vocab": false}, {"uilNum": 451, "display": "fallacious", "acceptable": ["fallacious"], "vocab": false}, {"uilNum": 452, "display": "famulus", "acceptable": ["famulus"], "vocab": false}, {"uilNum": 453, "display": "fantastico •", "acceptable": ["fantastico"], "vocab": false}, {"uilNum": 454, "display": "fatidic •", "acceptable": ["fatidic"], "vocab": false}, {"uilNum": 455, "display": "faux pas (singular)", "acceptable": ["faux pas"], "vocab": false}, {"uilNum": 456, "display": "fedora", "acceptable": ["fedora"], "vocab": false}, {"uilNum": 457, "display": "felinity •", "acceptable": ["felinity"], "vocab": false}, {"uilNum": 458, "display": "feng shui •", "acceptable": ["feng shui"], "vocab": false}, {"uilNum": 459, "display": "Fenian •", "acceptable": ["Fenian"], "vocab": false}, {"uilNum": 460, "display": "fennec •", "acceptable": ["fennec"], "vocab": false}, {"uilNum": 461, "display": "Fertile Crescent", "acceptable": ["Fertile Crescent"], "vocab": false}, {"uilNum": 462, "display": "fetal alcohol syndrome", "acceptable": ["fetal alcohol syndrome"], "vocab": false}, {"uilNum": 463, "display": "feuilleton", "acceptable": ["feuilleton"], "vocab": false}, {"uilNum": 464, "display": "fez (a cap)", "acceptable": ["fez"], "vocab": false}, {"uilNum": 465, "display": "filiform", "acceptable": ["filiform"], "vocab": false}, {"uilNum": 466, "display": "fin-de-siècle", "acceptable": ["fin-de-siècle"], "vocab": false}, {"uilNum": 467, "display": "fiscal year", "acceptable": ["fiscal year"], "vocab": false}, {"uilNum": 468, "display": "fissionable", "acceptable": ["fissionable"], "vocab": false}, {"uilNum": 469, "display": "flaccid •", "acceptable": ["flaccid"], "vocab": false}, {"uilNum": 470, "display": "flame-retardant (adj)", "acceptable": ["flame-retardant"], "vocab": false}, {"uilNum": 471, "display": "fledgling, fledgeling", "acceptable": ["fledgling", "fledgeling"], "vocab": false}, {"uilNum": 472, "display": "flibbertigibbet", "acceptable": ["flibbertigibbet"], "vocab": false}, {"uilNum": 473, "display": "flotsam", "acceptable": ["flotsam"], "vocab": false}, {"uilNum": 474, "display": "fluoridation", "acceptable": ["fluoridation"], "vocab": false}, {"uilNum": 475, "display": "focus group", "acceptable": ["focus group"], "vocab": false}, {"uilNum": 476, "display": "foliicolous", "acceptable": ["foliicolous"], "vocab": false}, {"uilNum": 477, "display": "foreknowledge", "acceptable": ["foreknowledge"], "vocab": false}, {"uilNum": 478, "display": "forte-piano (adj/adv)", "acceptable": ["forte-piano"], "vocab": false}, {"uilNum": 479, "display": "fourth estate", "acceptable": ["fourth estate"], "vocab": false}, {"uilNum": 480, "display": "Francophobe", "acceptable": ["Francophobe"], "vocab": false}, {"uilNum": 481, "display": "freesia, Freesia", "acceptable": ["freesia", "Freesia"], "vocab": false}, {"uilNum": 482, "display": "friary", "acceptable": ["friary"], "vocab": false}, {"uilNum": 483, "display": "führer, fuehrer", "acceptable": ["führer", "fuehrer"], "vocab": false}, {"uilNum": 484, "display": "furriery", "acceptable": ["furriery"], "vocab": false}, {"uilNum": 485, "display": "galipot", "acceptable": ["galipot"], "vocab": false}, {"uilNum": 486, "display": "gallinaceous", "acceptable": ["gallinaceous"], "vocab": false}, {"uilNum": 487, "display": "gastrectomy", "acceptable": ["gastrectomy"], "vocab": false}, {"uilNum": 488, "display": "gastroesophageal", "acceptable": ["gastroesophageal"], "vocab": false}, {"uilNum": 489, "display": "gauchely •", "acceptable": ["gauchely"], "vocab": false}, {"uilNum": 490, "display": "gefilte fish •", "acceptable": ["gefilte fish"], "vocab": false}, {"uilNum": 491, "display": "Geiger counter", "acceptable": ["Geiger counter"], "vocab": false}, {"uilNum": 492, "display": "gelid •", "acceptable": ["gelid"], "vocab": false}, {"uilNum": 493, "display": "gemsbok", "acceptable": ["gemsbok"], "vocab": false}, {"uilNum": 494, "display": "Genghis Khan", "acceptable": ["Genghis Khan"], "vocab": false}, {"uilNum": 495, "display": "genotype", "acceptable": ["genotype"], "vocab": false}, {"uilNum": 496, "display": "genteelism", "acceptable": ["genteelism"], "vocab": false}, {"uilNum": 497, "display": "geomagnetic storm", "acceptable": ["geomagnetic storm"], "vocab": false}, {"uilNum": 498, "display": "geopolitics •", "acceptable": ["geopolitics"], "vocab": false}, {"uilNum": 499, "display": "gerbil", "acceptable": ["gerbil"], "vocab": false}, {"uilNum": 500, "display": "gerontocracy", "acceptable": ["gerontocracy"], "vocab": false}, {"uilNum": 501, "display": "ghoulish", "acceptable": ["ghoulish"], "vocab": false}, {"uilNum": 502, "display": "ghrelin •", "acceptable": ["ghrelin"], "vocab": false}, {"uilNum": 503, "display": "giantism", "acceptable": ["giantism"], "vocab": false}, {"uilNum": 504, "display": "gibbous", "acceptable": ["gibbous"], "vocab": false}, {"uilNum": 505, "display": "Gila monster", "acceptable": ["Gila monster"], "vocab": false}, {"uilNum": 506, "display": "gillnetter", "acceptable": ["gillnetter"], "vocab": false}, {"uilNum": 507, "display": "glaciology", "acceptable": ["glaciology"], "vocab": false}, {"uilNum": 508, "display": "glaucomatous", "acceptable": ["glaucomatous"], "vocab": false}, {"uilNum": 509, "display": "glissade", "acceptable": ["glissade"], "vocab": false}, {"uilNum": 510, "display": "globose", "acceptable": ["globose"], "vocab": false}, {"uilNum": 511, "display": "glockenspiel", "acceptable": ["glockenspiel"], "vocab": false}, {"uilNum": 512, "display": "glyptography", "acceptable": ["glyptography"], "vocab": false}, {"uilNum": 513, "display": "gnathic", "acceptable": ["gnathic"], "vocab": false}, {"uilNum": 514, "display": "go-getter", "acceptable": ["go-getter"], "vocab": false}, {"uilNum": 515, "display": "Gore-Tex (trademark)", "acceptable": ["Gore-Tex"], "vocab": false}, {"uilNum": 516, "display": "gouache •", "acceptable": ["gouache"], "vocab": false}, {"uilNum": 517, "display": "gram-negative, Gram-negative", "acceptable": ["gram-negative", "Gram-negative"], "vocab": false}, {"uilNum": 518, "display": "grande dame (singular)", "acceptable": ["grande dame"], "vocab": false}, {"uilNum": 519, "display": "gravamen •", "acceptable": ["gravamen"], "vocab": false}, {"uilNum": 520, "display": "grazioso", "acceptable": ["grazioso"], "vocab": false}, {"uilNum": 521, "display": "greige", "acceptable": ["greige"], "vocab": false}, {"uilNum": 522, "display": "grenadine •", "acceptable": ["grenadine"], "vocab": false}, {"uilNum": 523, "display": "griot •", "acceptable": ["griot"], "vocab": false}, {"uilNum": 524, "display": "G-suit", "acceptable": ["G-suit"], "vocab": false}, {"uilNum": 525, "display": "Guggenheim", "acceptable": ["Guggenheim"], "vocab": false}, {"uilNum": 526, "display": "gullibility", "acceptable": ["gullibility"], "vocab": false}, {"uilNum": 527, "display": "gumption", "acceptable": ["gumption"], "vocab": false}, {"uilNum": 528, "display": "gutturalize", "acceptable": ["gutturalize"], "vocab": false}, {"uilNum": 529, "display": "gyratory", "acceptable": ["gyratory"], "vocab": false}, {"uilNum": 530, "display": "gyrostatic", "acceptable": ["gyrostatic"], "vocab": false}, {"uilNum": 531, "display": "habergeon •", "acceptable": ["habergeon"], "vocab": false}, {"uilNum": 532, "display": "hacienda", "acceptable": ["hacienda"], "vocab": false}, {"uilNum": 533, "display": "hafnium", "acceptable": ["hafnium"], "vocab": false}, {"uilNum": 534, "display": "haggis", "acceptable": ["haggis"], "vocab": false}, {"uilNum": 535, "display": "Hainan", "acceptable": ["Hainan"], "vocab": false}, {"uilNum": 536, "display": "halation", "acceptable": ["halation"], "vocab": false}, {"uilNum": 537, "display": "halophyte •", "acceptable": ["halophyte"], "vocab": false}, {"uilNum": 538, "display": "hamadryas", "acceptable": ["hamadryas"], "vocab": false}, {"uilNum": 539, "display": "hand-to-mouth (adj", "acceptable": ["hand-to-mouth (adj"], "vocab": false}, {"uilNum": 540, "display": "harm’s way", "acceptable": ["harm’s way"], "vocab": false}, {"uilNum": 541, "display": "harquebus", "acceptable": ["harquebus"], "vocab": false}, {"uilNum": 542, "display": "haruspex •", "acceptable": ["haruspex"], "vocab": false}, {"uilNum": 543, "display": "hausfrau", "acceptable": ["hausfrau"], "vocab": false}, {"uilNum": 544, "display": "haute école •", "acceptable": ["haute école"], "vocab": false}, {"uilNum": 545, "display": "heartsease, heart's-ease", "acceptable": ["heartsease", "heart's-ease"], "vocab": false}, {"uilNum": 546, "display": "heinously", "acceptable": ["heinously"], "vocab": false}, {"uilNum": 547, "display": "heliculture", "acceptable": ["heliculture"], "vocab": false}, {"uilNum": 548, "display": "heliotrope", "acceptable": ["heliotrope"], "vocab": false}, {"uilNum": 549, "display": "hematite", "acceptable": ["hematite"], "vocab": false}, {"uilNum": 550, "display": "hematology •", "acceptable": ["hematology"], "vocab": false}, {"uilNum": 551, "display": "hemialgia", "acceptable": ["hemialgia"], "vocab": false}, {"uilNum": 552, "display": "hemoglobin", "acceptable": ["hemoglobin"], "vocab": false}, {"uilNum": 553, "display": "henotheism", "acceptable": ["henotheism"], "vocab": false}, {"uilNum": 554, "display": "Heptateuch •", "acceptable": ["Heptateuch"], "vocab": false}, {"uilNum": 555, "display": "heritability •", "acceptable": ["heritability"], "vocab": false}, {"uilNum": 556, "display": "hermeneutic", "acceptable": ["hermeneutic"], "vocab": false}, {"uilNum": 557, "display": "Hesperides", "acceptable": ["Hesperides"], "vocab": false}, {"uilNum": 558, "display": "heteroecious", "acceptable": ["heteroecious"], "vocab": false}, {"uilNum": 559, "display": "hexad", "acceptable": ["hexad"], "vocab": false}, {"uilNum": 560, "display": "hexagonal •", "acceptable": ["hexagonal"], "vocab": false}, {"uilNum": 561, "display": "hibernaculum", "acceptable": ["hibernaculum"], "vocab": false}, {"uilNum": 562, "display": "hierophant •", "acceptable": ["hierophant"], "vocab": false}, {"uilNum": 563, "display": "higgledy-piggledy", "acceptable": ["higgledy-piggledy"], "vocab": false}, {"uilNum": 564, "display": "hippogriff, hippogryph", "acceptable": ["hippogriff", "hippogryph"], "vocab": false}, {"uilNum": 565, "display": "Hiroshima", "acceptable": ["Hiroshima"], "vocab": false}, {"uilNum": 566, "display": "Homo sapiens", "acceptable": ["Homo sapiens"], "vocab": false}, {"uilNum": 567, "display": "homogeneity •", "acceptable": ["homogeneity"], "vocab": false}, {"uilNum": 568, "display": "Hoosier", "acceptable": ["Hoosier"], "vocab": false}, {"uilNum": 569, "display": "hornblende", "acceptable": ["hornblende"], "vocab": false}, {"uilNum": 570, "display": "hospitable •", "acceptable": ["hospitable"], "vocab": false}, {"uilNum": 571, "display": "hot-dogging", "acceptable": ["hot-dogging"], "vocab": false}, {"uilNum": 572, "display": "hubristic •", "acceptable": ["hubristic"], "vocab": false}, {"uilNum": 573, "display": "humanitarianism •", "acceptable": ["humanitarianism"], "vocab": false}, {"uilNum": 574, "display": "hunter-gatherer", "acceptable": ["hunter-gatherer"], "vocab": false}, {"uilNum": 575, "display": "hydroelectric", "acceptable": ["hydroelectric"], "vocab": false}, {"uilNum": 576, "display": "hygroscopic •", "acceptable": ["hygroscopic"], "vocab": false}, {"uilNum": 577, "display": "hypaethral, hypethral", "acceptable": ["hypaethral", "hypethral"], "vocab": false}, {"uilNum": 578, "display": "hypergolic", "acceptable": ["hypergolic"], "vocab": false}, {"uilNum": 579, "display": "hypnopompic", "acceptable": ["hypnopompic"], "vocab": false}, {"uilNum": 580, "display": "hypocoristic", "acceptable": ["hypocoristic"], "vocab": false}, {"uilNum": 581, "display": "hypoeutectic", "acceptable": ["hypoeutectic"], "vocab": false}, {"uilNum": 582, "display": "hyrax •", "acceptable": ["hyrax"], "vocab": false}, {"uilNum": 583, "display": "iamb •", "acceptable": ["iamb"], "vocab": false}, {"uilNum": 584, "display": "ibidem", "acceptable": ["ibidem"], "vocab": false}, {"uilNum": 585, "display": "ichthyosis", "acceptable": ["ichthyosis"], "vocab": false}, {"uilNum": 586, "display": "iconographer", "acceptable": ["iconographer"], "vocab": false}, {"uilNum": 587, "display": "idiopathic", "acceptable": ["idiopathic"], "vocab": false}, {"uilNum": 588, "display": "idiotically", "acceptable": ["idiotically"], "vocab": false}, {"uilNum": 589, "display": "idyllic •", "acceptable": ["idyllic"], "vocab": false}, {"uilNum": 590, "display": "illation •", "acceptable": ["illation"], "vocab": false}, {"uilNum": 591, "display": "illusionist", "acceptable": ["illusionist"], "vocab": false}, {"uilNum": 592, "display": "immeasurable", "acceptable": ["immeasurable"], "vocab": false}, {"uilNum": 593, "display": "Immelmann", "acceptable": ["Immelmann"], "vocab": false}, {"uilNum": 594, "display": "immersion •", "acceptable": ["immersion"], "vocab": false}, {"uilNum": 595, "display": "immobility", "acceptable": ["immobility"], "vocab": false}, {"uilNum": 596, "display": "immortelle", "acceptable": ["immortelle"], "vocab": false}, {"uilNum": 597, "display": "immunologist", "acceptable": ["immunologist"], "vocab": false}, {"uilNum": 598, "display": "impartial", "acceptable": ["impartial"], "vocab": false}, {"uilNum": 599, "display": "impedimenta", "acceptable": ["impedimenta"], "vocab": false}, {"uilNum": 600, "display": "impiety •", "acceptable": ["impiety"], "vocab": false}, {"uilNum": 601, "display": "imprecate •", "acceptable": ["imprecate"], "vocab": false}, {"uilNum": 602, "display": "imprimis", "acceptable": ["imprimis"], "vocab": false}, {"uilNum": 603, "display": "impudicity •", "acceptable": ["impudicity"], "vocab": false}, {"uilNum": 604, "display": "in posse", "acceptable": ["in posse"], "vocab": false}, {"uilNum": 605, "display": "in utero", "acceptable": ["in utero"], "vocab": false}, {"uilNum": 606, "display": "inane •", "acceptable": ["inane"], "vocab": false}, {"uilNum": 607, "display": "incarcerate", "acceptable": ["incarcerate"], "vocab": false}, {"uilNum": 608, "display": "incoherence", "acceptable": ["incoherence"], "vocab": false}, {"uilNum": 609, "display": "inconsequential •", "acceptable": ["inconsequential"], "vocab": false}, {"uilNum": 610, "display": "incredulity", "acceptable": ["incredulity"], "vocab": false}, {"uilNum": 611, "display": "incurable", "acceptable": ["incurable"], "vocab": false}, {"uilNum": 612, "display": "indentation", "acceptable": ["indentation"], "vocab": false}, {"uilNum": 613, "display": "indigence", "acceptable": ["indigence"], "vocab": false}, {"uilNum": 614, "display": "indite", "acceptable": ["indite"], "vocab": false}, {"uilNum": 615, "display": "indivisible", "acceptable": ["indivisible"], "vocab": false}, {"uilNum": 616, "display": "Indochina •", "acceptable": ["Indochina"], "vocab": false}, {"uilNum": 617, "display": "ineffable •", "acceptable": ["ineffable"], "vocab": false}, {"uilNum": 618, "display": "inexpugnable •", "acceptable": ["inexpugnable"], "vocab": false}, {"uilNum": 619, "display": "inferential", "acceptable": ["inferential"], "vocab": false}, {"uilNum": 620, "display": "influence peddling", "acceptable": ["influence peddling"], "vocab": false}, {"uilNum": 621, "display": "infundibuliform", "acceptable": ["infundibuliform"], "vocab": false}, {"uilNum": 622, "display": "ingenuous", "acceptable": ["ingenuous"], "vocab": false}, {"uilNum": 623, "display": "inhibitable", "acceptable": ["inhibitable"], "vocab": false}, {"uilNum": 624, "display": "iniquity •", "acceptable": ["iniquity"], "vocab": false}, {"uilNum": 625, "display": "innuendoes", "acceptable": ["innuendoes"], "vocab": false}, {"uilNum": 626, "display": "inopportune", "acceptable": ["inopportune"], "vocab": false}, {"uilNum": 627, "display": "inordinate •", "acceptable": ["inordinate"], "vocab": false}, {"uilNum": 628, "display": "insalubrious", "acceptable": ["insalubrious"], "vocab": false}, {"uilNum": 629, "display": "insightful", "acceptable": ["insightful"], "vocab": false}, {"uilNum": 630, "display": "insurrection", "acceptable": ["insurrection"], "vocab": false}, {"uilNum": 631, "display": "inter vivos •", "acceptable": ["inter vivos"], "vocab": false}, {"uilNum": 632, "display": "interchangeable", "acceptable": ["interchangeable"], "vocab": false}, {"uilNum": 633, "display": "interment •", "acceptable": ["interment"], "vocab": false}, {"uilNum": 634, "display": "intermezzo", "acceptable": ["intermezzo"], "vocab": false}, {"uilNum": 635, "display": "intramural", "acceptable": ["intramural"], "vocab": false}, {"uilNum": 636, "display": "intrapreneur", "acceptable": ["intrapreneur"], "vocab": false}, {"uilNum": 637, "display": "introrse", "acceptable": ["introrse"], "vocab": false}, {"uilNum": 638, "display": "invalidate", "acceptable": ["invalidate"], "vocab": false}, {"uilNum": 639, "display": "invective", "acceptable": ["invective"], "vocab": false}, {"uilNum": 640, "display": "inveigle •", "acceptable": ["inveigle"], "vocab": false}, {"uilNum": 641, "display": "invidious", "acceptable": ["invidious"], "vocab": false}, {"uilNum": 642, "display": "ipecac", "acceptable": ["ipecac"], "vocab": false}, {"uilNum": 643, "display": "ipso facto •", "acceptable": ["ipso facto"], "vocab": false}, {"uilNum": 644, "display": "iridology •", "acceptable": ["iridology"], "vocab": false}, {"uilNum": 645, "display": "irredentist", "acceptable": ["irredentist"], "vocab": false}, {"uilNum": 646, "display": "irresolute", "acceptable": ["irresolute"], "vocab": false}, {"uilNum": 647, "display": "isochronal", "acceptable": ["isochronal"], "vocab": false}, {"uilNum": 648, "display": "isohyet •", "acceptable": ["isohyet"], "vocab": false}, {"uilNum": 649, "display": "Italianate", "acceptable": ["Italianate"], "vocab": false}, {"uilNum": 650, "display": "itinerant •", "acceptable": ["itinerant"], "vocab": false}, {"uilNum": 651, "display": "jack-o'-lantern", "acceptable": ["jack-o'-lantern"], "vocab": false}, {"uilNum": 652, "display": "jacquard, Jacquard (fabric/loom)", "acceptable": ["jacquard", "Jacquard"], "vocab": false}, {"uilNum": 653, "display": "jadeite", "acceptable": ["jadeite"], "vocab": false}, {"uilNum": 654, "display": "Jakarta, Djakarta •", "acceptable": ["Jakarta", "Djakarta"], "vocab": false}, {"uilNum": 655, "display": "jalousie", "acceptable": ["jalousie"], "vocab": false}, {"uilNum": 656, "display": "japonica", "acceptable": ["japonica"], "vocab": false}, {"uilNum": 657, "display": "jeepney", "acceptable": ["jeepney"], "vocab": false}, {"uilNum": 658, "display": "Jericho", "acceptable": ["Jericho"], "vocab": false}, {"uilNum": 659, "display": "Jesuit, jesuit", "acceptable": ["Jesuit", "jesuit"], "vocab": false}, {"uilNum": 660, "display": "jet-propelled", "acceptable": ["jet-propelled"], "vocab": false}, {"uilNum": 661, "display": "jicama", "acceptable": ["jicama"], "vocab": false}, {"uilNum": 662, "display": "jihad", "acceptable": ["jihad"], "vocab": false}, {"uilNum": 663, "display": "Johnny-come-lately", "acceptable": ["Johnny-come-lately"], "vocab": false}, {"uilNum": 664, "display": "joie de vivre •", "acceptable": ["joie de vivre"], "vocab": false}, {"uilNum": 665, "display": "Judaize", "acceptable": ["Judaize"], "vocab": false}, {"uilNum": 666, "display": "Jugendstil", "acceptable": ["Jugendstil"], "vocab": false}, {"uilNum": 667, "display": "julep", "acceptable": ["julep"], "vocab": false}, {"uilNum": 668, "display": "jury-rigged", "acceptable": ["jury-rigged"], "vocab": false}, {"uilNum": 669, "display": "justifiable", "acceptable": ["justifiable"], "vocab": false}, {"uilNum": 670, "display": "juxtaposition", "acceptable": ["juxtaposition"], "vocab": false}, {"uilNum": 671, "display": "Kafkaesque •", "acceptable": ["Kafkaesque"], "vocab": false}, {"uilNum": 672, "display": "kakapo", "acceptable": ["kakapo"], "vocab": false}, {"uilNum": 673, "display": "kanzu", "acceptable": ["kanzu"], "vocab": false}, {"uilNum": 674, "display": "katabatic", "acceptable": ["katabatic"], "vocab": false}, {"uilNum": 675, "display": "Kathmandu, Katmandu", "acceptable": ["Kathmandu", "Katmandu"], "vocab": false}, {"uilNum": 676, "display": "Kenya", "acceptable": ["Kenya"], "vocab": false}, {"uilNum": 677, "display": "keratitis", "acceptable": ["keratitis"], "vocab": false}, {"uilNum": 678, "display": "ketosteroid", "acceptable": ["ketosteroid"], "vocab": false}, {"uilNum": 679, "display": "khipu, quipu •", "acceptable": ["khipu", "quipu"], "vocab": false}, {"uilNum": 680, "display": "Khrushchev", "acceptable": ["Khrushchev"], "vocab": false}, {"uilNum": 681, "display": "kiloton", "acceptable": ["kiloton"], "vocab": false}, {"uilNum": 682, "display": "kinesics", "acceptable": ["kinesics"], "vocab": false}, {"uilNum": 683, "display": "Kiribati", "acceptable": ["Kiribati"], "vocab": false}, {"uilNum": 684, "display": "kirigami •", "acceptable": ["kirigami"], "vocab": false}, {"uilNum": 685, "display": "kismet", "acceptable": ["kismet"], "vocab": false}, {"uilNum": 686, "display": "kiwi", "acceptable": ["kiwi"], "vocab": false}, {"uilNum": 687, "display": "klieg light", "acceptable": ["klieg light"], "vocab": false}, {"uilNum": 688, "display": "knock-kneed", "acceptable": ["knock-kneed"], "vocab": false}, {"uilNum": 689, "display": "kookaburra •", "acceptable": ["kookaburra"], "vocab": false}, {"uilNum": 690, "display": "kouprey", "acceptable": ["kouprey"], "vocab": false}, {"uilNum": 691, "display": "Kremlinology", "acceptable": ["Kremlinology"], "vocab": false}, {"uilNum": 692, "display": "Kshatriya", "acceptable": ["Kshatriya"], "vocab": false}, {"uilNum": 693, "display": "Kuwait •", "acceptable": ["Kuwait"], "vocab": false}, {"uilNum": 694, "display": "kwashiorkor", "acceptable": ["kwashiorkor"], "vocab": false}, {"uilNum": 695, "display": "Labanotation", "acceptable": ["Labanotation"], "vocab": false}, {"uilNum": 696, "display": "labiodental •", "acceptable": ["labiodental"], "vocab": false}, {"uilNum": 697, "display": "lacrosse", "acceptable": ["lacrosse"], "vocab": false}, {"uilNum": 698, "display": "lactometer •", "acceptable": ["lactometer"], "vocab": false}, {"uilNum": 699, "display": "Laffer curve, Laffer Curve", "acceptable": ["Laffer curve", "Laffer Curve"], "vocab": false}, {"uilNum": 700, "display": "lagniappe", "acceptable": ["lagniappe"], "vocab": false}, {"uilNum": 701, "display": "lame duck (noun)", "acceptable": ["lame duck"], "vocab": false}, {"uilNum": 702, "display": "lammergeier, lammergeyer", "acceptable": ["lammergeier", "lammergeyer"], "vocab": false}, {"uilNum": 703, "display": "lampoon", "acceptable": ["lampoon"], "vocab": false}, {"uilNum": 704, "display": "lanceolate", "acceptable": ["lanceolate"], "vocab": false}, {"uilNum": 705, "display": "landgrave •", "acceptable": ["landgrave"], "vocab": false}, {"uilNum": 706, "display": "langoustine", "acceptable": ["langoustine"], "vocab": false}, {"uilNum": 707, "display": "lanugo •", "acceptable": ["lanugo"], "vocab": false}, {"uilNum": 708, "display": "largess, largesse", "acceptable": ["largess", "largesse"], "vocab": false}, {"uilNum": 709, "display": "lateen", "acceptable": ["lateen"], "vocab": false}, {"uilNum": 710, "display": "lathyrism •", "acceptable": ["lathyrism"], "vocab": false}, {"uilNum": 711, "display": "Latinize", "acceptable": ["Latinize"], "vocab": false}, {"uilNum": 712, "display": "latosol", "acceptable": ["latosol"], "vocab": false}, {"uilNum": 713, "display": "law-abiding", "acceptable": ["law-abiding"], "vocab": false}, {"uilNum": 714, "display": "lazy Susan", "acceptable": ["lazy Susan"], "vocab": false}, {"uilNum": 715, "display": "lecithinase", "acceptable": ["lecithinase"], "vocab": false}, {"uilNum": 716, "display": "legerity", "acceptable": ["legerity"], "vocab": false}, {"uilNum": 717, "display": "lenity •", "acceptable": ["lenity"], "vocab": false}, {"uilNum": 718, "display": "leopardess", "acceptable": ["leopardess"], "vocab": false}, {"uilNum": 719, "display": "leprosy", "acceptable": ["leprosy"], "vocab": false}, {"uilNum": 720, "display": "leptosome •", "acceptable": ["leptosome"], "vocab": false}, {"uilNum": 721, "display": "letters of marque", "acceptable": ["letters of marque"], "vocab": false}, {"uilNum": 722, "display": "lexicographer", "acceptable": ["lexicographer"], "vocab": false}, {"uilNum": 723, "display": "libration", "acceptable": ["libration"], "vocab": false}, {"uilNum": 724, "display": "licit", "acceptable": ["licit"], "vocab": false}, {"uilNum": 725, "display": "liege", "acceptable": ["liege"], "vocab": false}, {"uilNum": 726, "display": "ligneous •", "acceptable": ["ligneous"], "vocab": false}, {"uilNum": 727, "display": "limicolous •", "acceptable": ["limicolous"], "vocab": false}, {"uilNum": 728, "display": "linguine, linguini", "acceptable": ["linguine", "linguini"], "vocab": false}, {"uilNum": 729, "display": "liquescent", "acceptable": ["liquescent"], "vocab": false}, {"uilNum": 730, "display": "lithology", "acceptable": ["lithology"], "vocab": false}, {"uilNum": 731, "display": "litmus test", "acceptable": ["litmus test"], "vocab": false}, {"uilNum": 732, "display": "litotes", "acceptable": ["litotes"], "vocab": false}, {"uilNum": 733, "display": "lobotomize", "acceptable": ["lobotomize"], "vocab": false}, {"uilNum": 734, "display": "logion", "acceptable": ["logion"], "vocab": false}, {"uilNum": 735, "display": "logorrhea •", "acceptable": ["logorrhea"], "vocab": false}, {"uilNum": 736, "display": "lorikeet •", "acceptable": ["lorikeet"], "vocab": false}, {"uilNum": 737, "display": "louvered", "acceptable": ["louvered"], "vocab": false}, {"uilNum": 738, "display": "lucidity", "acceptable": ["lucidity"], "vocab": false}, {"uilNum": 739, "display": "luge", "acceptable": ["luge"], "vocab": false}, {"uilNum": 740, "display": "Luiseño •", "acceptable": ["Luiseño"], "vocab": false}, {"uilNum": 741, "display": "luminaria •", "acceptable": ["luminaria"], "vocab": false}, {"uilNum": 742, "display": "lummox •", "acceptable": ["lummox"], "vocab": false}, {"uilNum": 743, "display": "lunacy", "acceptable": ["lunacy"], "vocab": false}, {"uilNum": 744, "display": "lunarscape •", "acceptable": ["lunarscape"], "vocab": false}, {"uilNum": 745, "display": "Lutz, lutz •", "acceptable": ["Lutz", "lutz"], "vocab": false}, {"uilNum": 746, "display": "lysozyme •", "acceptable": ["lysozyme"], "vocab": false}, {"uilNum": 747, "display": "macédoine", "acceptable": ["macédoine"], "vocab": false}, {"uilNum": 748, "display": "machination •", "acceptable": ["machination"], "vocab": false}, {"uilNum": 749, "display": "Machu Picchu", "acceptable": ["Machu Picchu"], "vocab": false}, {"uilNum": 750, "display": "macramé", "acceptable": ["macramé"], "vocab": false}, {"uilNum": 751, "display": "macrofossil •", "acceptable": ["macrofossil"], "vocab": false}, {"uilNum": 752, "display": "macrography", "acceptable": ["macrography"], "vocab": false}, {"uilNum": 753, "display": "magisterium •", "acceptable": ["magisterium"], "vocab": false}, {"uilNum": 754, "display": "Magna Carta, Magna Charta", "acceptable": ["Magna Carta", "Magna Charta"], "vocab": false}, {"uilNum": 755, "display": "magnifico", "acceptable": ["magnifico"], "vocab": false}, {"uilNum": 756, "display": "maharishi •", "acceptable": ["maharishi"], "vocab": false}, {"uilNum": 757, "display": "majolica", "acceptable": ["majolica"], "vocab": false}, {"uilNum": 758, "display": "makimono", "acceptable": ["makimono"], "vocab": false}, {"uilNum": 759, "display": "Maldives", "acceptable": ["Maldives"], "vocab": false}, {"uilNum": 760, "display": "malignancy •", "acceptable": ["malignancy"], "vocab": false}, {"uilNum": 761, "display": "manacle", "acceptable": ["manacle"], "vocab": false}, {"uilNum": 762, "display": "mañana", "acceptable": ["mañana"], "vocab": false}, {"uilNum": 763, "display": "mandatory", "acceptable": ["mandatory"], "vocab": false}, {"uilNum": 764, "display": "mandibulate", "acceptable": ["mandibulate"], "vocab": false}, {"uilNum": 765, "display": "Manichaeism", "acceptable": ["Manichaeism"], "vocab": false}, {"uilNum": 766, "display": "manifest destiny, Manifest Destiny", "acceptable": ["manifest destiny", "Manifest Destiny"], "vocab": false}, {"uilNum": 767, "display": "Manitoba", "acceptable": ["Manitoba"], "vocab": false}, {"uilNum": 768, "display": "mano a mano", "acceptable": ["mano a mano"], "vocab": false}, {"uilNum": 769, "display": "manticore", "acceptable": ["manticore"], "vocab": false}, {"uilNum": 770, "display": "mantilla", "acceptable": ["mantilla"], "vocab": false}, {"uilNum": 771, "display": "marasmus •", "acceptable": ["marasmus"], "vocab": false}, {"uilNum": 772, "display": "marauder", "acceptable": ["marauder"], "vocab": false}, {"uilNum": 773, "display": "Marfan syndrome", "acceptable": ["Marfan syndrome"], "vocab": false}, {"uilNum": 774, "display": "marital", "acceptable": ["marital"], "vocab": false}, {"uilNum": 775, "display": "Marquesan", "acceptable": ["Marquesan"], "vocab": false}, {"uilNum": 776, "display": "martyrdom •", "acceptable": ["martyrdom"], "vocab": false}, {"uilNum": 777, "display": "massasauga", "acceptable": ["massasauga"], "vocab": false}, {"uilNum": 778, "display": "massless", "acceptable": ["massless"], "vocab": false}, {"uilNum": 779, "display": "mastectomy", "acceptable": ["mastectomy"], "vocab": false}, {"uilNum": 780, "display": "matriculant •", "acceptable": ["matriculant"], "vocab": false}, {"uilNum": 781, "display": "maturation", "acceptable": ["maturation"], "vocab": false}, {"uilNum": 782, "display": "maulstick, mahlstick", "acceptable": ["maulstick", "mahlstick"], "vocab": false}, {"uilNum": 783, "display": "maximization", "acceptable": ["maximization"], "vocab": false}, {"uilNum": 784, "display": "Mazatlán", "acceptable": ["Mazatlán"], "vocab": false}, {"uilNum": 785, "display": "mazel tov, mazal tov", "acceptable": ["mazel tov", "mazal tov"], "vocab": false}, {"uilNum": 786, "display": "McCarthyism", "acceptable": ["McCarthyism"], "vocab": false}, {"uilNum": 787, "display": "means test (noun)", "acceptable": ["means test"], "vocab": false}, {"uilNum": 788, "display": "mediator •", "acceptable": ["mediator"], "vocab": false}, {"uilNum": 789, "display": "medusoid", "acceptable": ["medusoid"], "vocab": false}, {"uilNum": 790, "display": "megalopolistic", "acceptable": ["megalopolistic"], "vocab": false}, {"uilNum": 791, "display": "meiosis •", "acceptable": ["meiosis"], "vocab": false}, {"uilNum": 792, "display": "melanoma", "acceptable": ["melanoma"], "vocab": false}, {"uilNum": 793, "display": "meliorism •", "acceptable": ["meliorism"], "vocab": false}, {"uilNum": 794, "display": "membranous", "acceptable": ["membranous"], "vocab": false}, {"uilNum": 795, "display": "meniscus •", "acceptable": ["meniscus"], "vocab": false}, {"uilNum": 796, "display": "Mennonite", "acceptable": ["Mennonite"], "vocab": false}, {"uilNum": 797, "display": "mentor, Mentor", "acceptable": ["mentor", "Mentor"], "vocab": false}, {"uilNum": 798, "display": "meroplankton", "acceptable": ["meroplankton"], "vocab": false}, {"uilNum": 799, "display": "merry-andrew", "acceptable": ["merry-andrew"], "vocab": false}, {"uilNum": 800, "display": "mesopelagic", "acceptable": ["mesopelagic"], "vocab": false}, {"uilNum": 801, "display": "Messiah, messiah", "acceptable": ["Messiah", "messiah"], "vocab": false}, {"uilNum": 802, "display": "metalinguistics •", "acceptable": ["metalinguistics"], "vocab": false}, {"uilNum": 803, "display": "metasomatism", "acceptable": ["metasomatism"], "vocab": false}, {"uilNum": 804, "display": "meteorologist", "acceptable": ["meteorologist"], "vocab": false}, {"uilNum": 805, "display": "mezzo-soprano •", "acceptable": ["mezzo-soprano"], "vocab": false}, {"uilNum": 806, "display": "microcyte", "acceptable": ["microcyte"], "vocab": false}, {"uilNum": 807, "display": "Miesian", "acceptable": ["Miesian"], "vocab": false}, {"uilNum": 808, "display": "milliner •", "acceptable": ["milliner"], "vocab": false}, {"uilNum": 809, "display": "mimosa, Mimosa", "acceptable": ["mimosa", "Mimosa"], "vocab": false}, {"uilNum": 810, "display": "mind-boggling", "acceptable": ["mind-boggling"], "vocab": false}, {"uilNum": 811, "display": "miniaturization", "acceptable": ["miniaturization"], "vocab": false}, {"uilNum": 812, "display": "minimalize", "acceptable": ["minimalize"], "vocab": false}, {"uilNum": 813, "display": "Minneapolis", "acceptable": ["Minneapolis"], "vocab": false}, {"uilNum": 814, "display": "mintage •", "acceptable": ["mintage"], "vocab": false}, {"uilNum": 815, "display": "Mirandize", "acceptable": ["Mirandize"], "vocab": false}, {"uilNum": 816, "display": "misbegotten", "acceptable": ["misbegotten"], "vocab": false}, {"uilNum": 817, "display": "mislabel", "acceptable": ["mislabel"], "vocab": false}, {"uilNum": 818, "display": "misogynistic", "acceptable": ["misogynistic"], "vocab": false}, {"uilNum": 819, "display": "misty-eyed", "acceptable": ["misty-eyed"], "vocab": false}, {"uilNum": 820, "display": "mitzvah", "acceptable": ["mitzvah"], "vocab": false}, {"uilNum": 821, "display": "moderato", "acceptable": ["moderato"], "vocab": false}, {"uilNum": 822, "display": "mofette, moffette", "acceptable": ["mofette", "moffette"], "vocab": false}, {"uilNum": 823, "display": "molluscicide", "acceptable": ["molluscicide"], "vocab": false}, {"uilNum": 824, "display": "monk's cloth", "acceptable": ["monk's cloth"], "vocab": false}, {"uilNum": 825, "display": "monogenism", "acceptable": ["monogenism"], "vocab": false}, {"uilNum": 826, "display": "monogyny", "acceptable": ["monogyny"], "vocab": false}, {"uilNum": 827, "display": "monomania •", "acceptable": ["monomania"], "vocab": false}, {"uilNum": 828, "display": "monstrance", "acceptable": ["monstrance"], "vocab": false}, {"uilNum": 829, "display": "Montessorian", "acceptable": ["Montessorian"], "vocab": false}, {"uilNum": 830, "display": "moorage", "acceptable": ["moorage"], "vocab": false}, {"uilNum": 831, "display": "morphallaxis", "acceptable": ["morphallaxis"], "vocab": false}, {"uilNum": 832, "display": "mortmain", "acceptable": ["mortmain"], "vocab": false}, {"uilNum": 833, "display": "Mosul •", "acceptable": ["Mosul"], "vocab": false}, {"uilNum": 834, "display": "moulage", "acceptable": ["moulage"], "vocab": false}, {"uilNum": 835, "display": "mouton •", "acceptable": ["mouton"], "vocab": false}, {"uilNum": 836, "display": "Mrs. Grundy", "acceptable": ["Mrs. Grundy"], "vocab": false}, {"uilNum": 837, "display": "muckraking", "acceptable": ["muckraking"], "vocab": false}, {"uilNum": 838, "display": "muffuletta •", "acceptable": ["muffuletta"], "vocab": false}, {"uilNum": 839, "display": "Müllerian mimicry", "acceptable": ["Müllerian mimicry"], "vocab": false}, {"uilNum": 840, "display": "multipliable", "acceptable": ["multipliable"], "vocab": false}, {"uilNum": 841, "display": "multisensory", "acceptable": ["multisensory"], "vocab": false}, {"uilNum": 842, "display": "mummery", "acceptable": ["mummery"], "vocab": false}, {"uilNum": 843, "display": "musculoskeletal", "acceptable": ["musculoskeletal"], "vocab": false}, {"uilNum": 844, "display": "mustache, moustache", "acceptable": ["mustache", "moustache"], "vocab": false}, {"uilNum": 845, "display": "mutatis mutandis", "acceptable": ["mutatis mutandis"], "vocab": false}, {"uilNum": 846, "display": "myasthenia •", "acceptable": ["myasthenia"], "vocab": false}, {"uilNum": 847, "display": "myelitis •", "acceptable": ["myelitis"], "vocab": false}, {"uilNum": 848, "display": "myopia •", "acceptable": ["myopia"], "vocab": false}, {"uilNum": 849, "display": "myrmecology", "acceptable": ["myrmecology"], "vocab": false}, {"uilNum": 850, "display": "mythologic", "acceptable": ["mythologic"], "vocab": false}, {"uilNum": 851, "display": "nacre •", "acceptable": ["nacre"], "vocab": false}, {"uilNum": 852, "display": "nainsook", "acceptable": ["nainsook"], "vocab": false}, {"uilNum": 853, "display": "napery •", "acceptable": ["napery"], "vocab": false}, {"uilNum": 854, "display": "nasopharynx", "acceptable": ["nasopharynx"], "vocab": false}, {"uilNum": 855, "display": "naturopathy", "acceptable": ["naturopathy"], "vocab": false}, {"uilNum": 856, "display": "Nausicaa", "acceptable": ["Nausicaa"], "vocab": false}, {"uilNum": 857, "display": "naysayer", "acceptable": ["naysayer"], "vocab": false}, {"uilNum": 858, "display": "Neapolitan", "acceptable": ["Neapolitan"], "vocab": false}, {"uilNum": 859, "display": "nematology •", "acceptable": ["nematology"], "vocab": false}, {"uilNum": 860, "display": "nemesis, Nemesis", "acceptable": ["nemesis", "Nemesis"], "vocab": false}, {"uilNum": 861, "display": "neoconservative", "acceptable": ["neoconservative"], "vocab": false}, {"uilNum": 862, "display": "neofascism", "acceptable": ["neofascism"], "vocab": false}, {"uilNum": 863, "display": "neonatal", "acceptable": ["neonatal"], "vocab": false}, {"uilNum": 864, "display": "nepenthe", "acceptable": ["nepenthe"], "vocab": false}, {"uilNum": 865, "display": "nephrectomy •", "acceptable": ["nephrectomy"], "vocab": false}, {"uilNum": 866, "display": "neuralgia •", "acceptable": ["neuralgia"], "vocab": false}, {"uilNum": 867, "display": "neurotically", "acceptable": ["neurotically"], "vocab": false}, {"uilNum": 868, "display": "nevus", "acceptable": ["nevus"], "vocab": false}, {"uilNum": 869, "display": "nickeliferous", "acceptable": ["nickeliferous"], "vocab": false}, {"uilNum": 870, "display": "nightclothes", "acceptable": ["nightclothes"], "vocab": false}, {"uilNum": 871, "display": "nihility", "acceptable": ["nihility"], "vocab": false}, {"uilNum": 872, "display": "nimrod, Nimrod", "acceptable": ["nimrod", "Nimrod"], "vocab": false}, {"uilNum": 873, "display": "noctuid", "acceptable": ["noctuid"], "vocab": false}, {"uilNum": 874, "display": "nocuous •", "acceptable": ["nocuous"], "vocab": false}, {"uilNum": 875, "display": "nolo contendere •", "acceptable": ["nolo contendere"], "vocab": false}, {"uilNum": 876, "display": "nom de guerre (singular)", "acceptable": ["nom de guerre"], "vocab": false}, {"uilNum": 877, "display": "nomenklatura •", "acceptable": ["nomenklatura"], "vocab": false}, {"uilNum": 878, "display": "nonaligned •", "acceptable": ["nonaligned"], "vocab": false}, {"uilNum": 879, "display": "noncustodial", "acceptable": ["noncustodial"], "vocab": false}, {"uilNum": 880, "display": "non-Euclidean", "acceptable": ["non-Euclidean"], "vocab": false}, {"uilNum": 881, "display": "nonferrous", "acceptable": ["nonferrous"], "vocab": false}, {"uilNum": 882, "display": "nonperson", "acceptable": ["nonperson"], "vocab": false}, {"uilNum": 883, "display": "nonplus", "acceptable": ["nonplus"], "vocab": false}, {"uilNum": 884, "display": "Norgay", "acceptable": ["Norgay"], "vocab": false}, {"uilNum": 885, "display": "nosh", "acceptable": ["nosh"], "vocab": false}, {"uilNum": 886, "display": "nota bene", "acceptable": ["nota bene"], "vocab": false}, {"uilNum": 887, "display": "nuclear family", "acceptable": ["nuclear family"], "vocab": false}, {"uilNum": 888, "display": "nyctinasty •", "acceptable": ["nyctinasty"], "vocab": false}, {"uilNum": 889, "display": "obeisance •", "acceptable": ["obeisance"], "vocab": false}, {"uilNum": 890, "display": "obento •", "acceptable": ["obento"], "vocab": false}, {"uilNum": 891, "display": "obligee •", "acceptable": ["obligee"], "vocab": false}, {"uilNum": 892, "display": "obloquy", "acceptable": ["obloquy"], "vocab": false}, {"uilNum": 893, "display": "obsessiveness", "acceptable": ["obsessiveness"], "vocab": false}, {"uilNum": 894, "display": "obtuseness", "acceptable": ["obtuseness"], "vocab": false}, {"uilNum": 895, "display": "Occidentalism", "acceptable": ["Occidentalism"], "vocab": false}, {"uilNum": 896, "display": "occipital", "acceptable": ["occipital"], "vocab": false}, {"uilNum": 897, "display": "occlude", "acceptable": ["occlude"], "vocab": false}, {"uilNum": 898, "display": "Oceania •", "acceptable": ["Oceania"], "vocab": false}, {"uilNum": 899, "display": "Ockham’s razor, Occam’s razor", "acceptable": ["Ockham’s razor", "Occam’s razor"], "vocab": false}, {"uilNum": 900, "display": "octillionth", "acceptable": ["octillionth"], "vocab": false}, {"uilNum": 901, "display": "oculogyric", "acceptable": ["oculogyric"], "vocab": false}, {"uilNum": 902, "display": "odysseys", "acceptable": ["odysseys"], "vocab": false}, {"uilNum": 903, "display": "officialese", "acceptable": ["officialese"], "vocab": false}, {"uilNum": 904, "display": "oganesson", "acceptable": ["oganesson"], "vocab": false}, {"uilNum": 905, "display": "ohmmeter •", "acceptable": ["ohmmeter"], "vocab": false}, {"uilNum": 906, "display": "okapi", "acceptable": ["okapi"], "vocab": false}, {"uilNum": 907, "display": "oleaster", "acceptable": ["oleaster"], "vocab": false}, {"uilNum": 908, "display": "oligopoly", "acceptable": ["oligopoly"], "vocab": false}, {"uilNum": 909, "display": "olivaceous", "acceptable": ["olivaceous"], "vocab": false}, {"uilNum": 910, "display": "ombudsman", "acceptable": ["ombudsman"], "vocab": false}, {"uilNum": 911, "display": "omnibus", "acceptable": ["omnibus"], "vocab": false}, {"uilNum": 912, "display": "omphalos •", "acceptable": ["omphalos"], "vocab": false}, {"uilNum": 913, "display": "oncologist", "acceptable": ["oncologist"], "vocab": false}, {"uilNum": 914, "display": "onycholysis", "acceptable": ["onycholysis"], "vocab": false}, {"uilNum": 915, "display": "oology •", "acceptable": ["oology"], "vocab": false}, {"uilNum": 916, "display": "operational", "acceptable": ["operational"], "vocab": false}, {"uilNum": 917, "display": "opisthognathous •", "acceptable": ["opisthognathous"], "vocab": false}, {"uilNum": 918, "display": "opportunist", "acceptable": ["opportunist"], "vocab": false}, {"uilNum": 919, "display": "oratorio •", "acceptable": ["oratorio"], "vocab": false}, {"uilNum": 920, "display": "orecchiette", "acceptable": ["orecchiette"], "vocab": false}, {"uilNum": 921, "display": "Oregon Trail", "acceptable": ["Oregon Trail"], "vocab": false}, {"uilNum": 922, "display": "ornamentation", "acceptable": ["ornamentation"], "vocab": false}, {"uilNum": 923, "display": "orogeny •", "acceptable": ["orogeny"], "vocab": false}, {"uilNum": 924, "display": "orthographist", "acceptable": ["orthographist"], "vocab": false}, {"uilNum": 925, "display": "orthotics", "acceptable": ["orthotics"], "vocab": false}, {"uilNum": 926, "display": "oryx", "acceptable": ["oryx"], "vocab": false}, {"uilNum": 927, "display": "oscitancy", "acceptable": ["oscitancy"], "vocab": false}, {"uilNum": 928, "display": "Osiris", "acceptable": ["Osiris"], "vocab": false}, {"uilNum": 929, "display": "Osnabrück", "acceptable": ["Osnabrück"], "vocab": false}, {"uilNum": 930, "display": "ossification", "acceptable": ["ossification"], "vocab": false}, {"uilNum": 931, "display": "osteoarthritis", "acceptable": ["osteoarthritis"], "vocab": false}, {"uilNum": 932, "display": "osteoma", "acceptable": ["osteoma"], "vocab": false}, {"uilNum": 933, "display": "otosclerosis •", "acceptable": ["otosclerosis"], "vocab": false}, {"uilNum": 934, "display": "ottava rima •", "acceptable": ["ottava rima"], "vocab": false}, {"uilNum": 935, "display": "outpatient", "acceptable": ["outpatient"], "vocab": false}, {"uilNum": 936, "display": "overcommitment", "acceptable": ["overcommitment"], "vocab": false}, {"uilNum": 937, "display": "oxymoron", "acceptable": ["oxymoron"], "vocab": false}, {"uilNum": 938, "display": "pachydermatous", "acceptable": ["pachydermatous"], "vocab": false}, {"uilNum": 939, "display": "pacification, Pacification", "acceptable": ["pacification", "Pacification"], "vocab": false}, {"uilNum": 940, "display": "paczki", "acceptable": ["paczki"], "vocab": false}, {"uilNum": 941, "display": "paduasoy •", "acceptable": ["paduasoy"], "vocab": false}, {"uilNum": 942, "display": "pageantry", "acceptable": ["pageantry"], "vocab": false}, {"uilNum": 943, "display": "Paiute, Piute (noun)", "acceptable": ["Paiute", "Piute"], "vocab": false}, {"uilNum": 944, "display": "paleolith", "acceptable": ["paleolith"], "vocab": false}, {"uilNum": 945, "display": "Pallas", "acceptable": ["Pallas"], "vocab": false}, {"uilNum": 946, "display": "palmistry", "acceptable": ["palmistry"], "vocab": false}, {"uilNum": 947, "display": "palsied (adj)", "acceptable": ["palsied"], "vocab": false}, {"uilNum": 948, "display": "palynology", "acceptable": ["palynology"], "vocab": false}, {"uilNum": 949, "display": "panache •", "acceptable": ["panache"], "vocab": false}, {"uilNum": 950, "display": "Pan-American", "acceptable": ["Pan-American"], "vocab": false}, {"uilNum": 951, "display": "Pandora’s box", "acceptable": ["Pandora’s box"], "vocab": false}, {"uilNum": 952, "display": "pangolin •", "acceptable": ["pangolin"], "vocab": false}, {"uilNum": 953, "display": "panhandler", "acceptable": ["panhandler"], "vocab": false}, {"uilNum": 954, "display": "pantropic", "acceptable": ["pantropic"], "vocab": false}, {"uilNum": 955, "display": "papier-mâché (adj)", "acceptable": ["papier-mâché"], "vocab": false}, {"uilNum": 956, "display": "papilloma", "acceptable": ["papilloma"], "vocab": false}, {"uilNum": 957, "display": "paraph •", "acceptable": ["paraph"], "vocab": false}, {"uilNum": 958, "display": "paraselene (singular)", "acceptable": ["paraselene"], "vocab": false}, {"uilNum": 959, "display": "paratyphoid fever •", "acceptable": ["paratyphoid fever"], "vocab": false}, {"uilNum": 960, "display": "Parcheesi (trademark)", "acceptable": ["Parcheesi"], "vocab": false}, {"uilNum": 961, "display": "parhelion", "acceptable": ["parhelion"], "vocab": false}, {"uilNum": 962, "display": "Parkinson's disease", "acceptable": ["Parkinson's disease"], "vocab": false}, {"uilNum": 963, "display": "parotid", "acceptable": ["parotid"], "vocab": false}, {"uilNum": 964, "display": "parsimonious •", "acceptable": ["parsimonious"], "vocab": false}, {"uilNum": 965, "display": "Parsons table", "acceptable": ["Parsons table"], "vocab": false}, {"uilNum": 966, "display": "parti pris (singular)", "acceptable": ["parti pris"], "vocab": false}, {"uilNum": 967, "display": "participatory", "acceptable": ["participatory"], "vocab": false}, {"uilNum": 968, "display": "parvis •", "acceptable": ["parvis"], "vocab": false}, {"uilNum": 969, "display": "paso doble, pasodoble", "acceptable": ["paso doble", "pasodoble"], "vocab": false}, {"uilNum": 970, "display": "passant", "acceptable": ["passant"], "vocab": false}, {"uilNum": 971, "display": "pastime", "acceptable": ["pastime"], "vocab": false}, {"uilNum": 972, "display": "patelliform", "acceptable": ["patelliform"], "vocab": false}, {"uilNum": 973, "display": "patisserie", "acceptable": ["patisserie"], "vocab": false}, {"uilNum": 974, "display": "patrimony", "acceptable": ["patrimony"], "vocab": false}, {"uilNum": 975, "display": "patronage", "acceptable": ["patronage"], "vocab": false}, {"uilNum": 976, "display": "paunchiness", "acceptable": ["paunchiness"], "vocab": false}, {"uilNum": 977, "display": "pavonine", "acceptable": ["pavonine"], "vocab": false}, {"uilNum": 978, "display": "payola", "acceptable": ["payola"], "vocab": false}, {"uilNum": 979, "display": "peccary", "acceptable": ["peccary"], "vocab": false}, {"uilNum": 980, "display": "pediatrics", "acceptable": ["pediatrics"], "vocab": false}, {"uilNum": 981, "display": "pediform", "acceptable": ["pediform"], "vocab": false}, {"uilNum": 982, "display": "Peking man", "acceptable": ["Peking man"], "vocab": false}, {"uilNum": 983, "display": "penchant", "acceptable": ["penchant"], "vocab": false}, {"uilNum": 984, "display": "peninsular", "acceptable": ["peninsular"], "vocab": false}, {"uilNum": 985, "display": "pentahedron", "acceptable": ["pentahedron"], "vocab": false}, {"uilNum": 986, "display": "penumbra", "acceptable": ["penumbra"], "vocab": false}, {"uilNum": 987, "display": "per se", "acceptable": ["per se"], "vocab": false}, {"uilNum": 988, "display": "perdurable •", "acceptable": ["perdurable"], "vocab": false}, {"uilNum": 989, "display": "perfidious •", "acceptable": ["perfidious"], "vocab": false}, {"uilNum": 990, "display": "perilune", "acceptable": ["perilune"], "vocab": false}, {"uilNum": 991, "display": "peripeteia, peripetia", "acceptable": ["peripeteia", "peripetia"], "vocab": false}, {"uilNum": 992, "display": "peristyle", "acceptable": ["peristyle"], "vocab": false}, {"uilNum": 993, "display": "perjure", "acceptable": ["perjure"], "vocab": false}, {"uilNum": 994, "display": "perorate", "acceptable": ["perorate"], "vocab": false}, {"uilNum": 995, "display": "persuasible", "acceptable": ["persuasible"], "vocab": false}, {"uilNum": 996, "display": "Peruvian", "acceptable": ["Peruvian"], "vocab": false}, {"uilNum": 997, "display": "pervasive", "acceptable": ["pervasive"], "vocab": false}, {"uilNum": 998, "display": "petechia", "acceptable": ["petechia"], "vocab": false}, {"uilNum": 999, "display": "petrification", "acceptable": ["petrification"], "vocab": false}, {"uilNum": 1000, "display": "petrodollars", "acceptable": ["petrodollars"], "vocab": false}, {"uilNum": 1001, "display": "pfennig", "acceptable": ["pfennig"], "vocab": false}, {"uilNum": 1002, "display": "pharmacodynamics •", "acceptable": ["pharmacodynamics"], "vocab": false}, {"uilNum": 1003, "display": "pheromone •", "acceptable": ["pheromone"], "vocab": false}, {"uilNum": 1004, "display": "philanthropist", "acceptable": ["philanthropist"], "vocab": false}, {"uilNum": 1005, "display": "Philippine mahogany", "acceptable": ["Philippine mahogany"], "vocab": false}, {"uilNum": 1006, "display": "philoprogenitive", "acceptable": ["philoprogenitive"], "vocab": false}, {"uilNum": 1007, "display": "phlegmatic", "acceptable": ["phlegmatic"], "vocab": false}, {"uilNum": 1008, "display": "photojournalism", "acceptable": ["photojournalism"], "vocab": false}, {"uilNum": 1009, "display": "phylactery •", "acceptable": ["phylactery"], "vocab": false}, {"uilNum": 1010, "display": "piacular •", "acceptable": ["piacular"], "vocab": false}, {"uilNum": 1011, "display": "piccoloist", "acceptable": ["piccoloist"], "vocab": false}, {"uilNum": 1012, "display": "pilferage", "acceptable": ["pilferage"], "vocab": false}, {"uilNum": 1013, "display": "pimpernel", "acceptable": ["pimpernel"], "vocab": false}, {"uilNum": 1014, "display": "pique", "acceptable": ["pique"], "vocab": false}, {"uilNum": 1015, "display": "placebo", "acceptable": ["placebo"], "vocab": false}, {"uilNum": 1016, "display": "plagiarist •", "acceptable": ["plagiarist"], "vocab": false}, {"uilNum": 1017, "display": "planetesimal", "acceptable": ["planetesimal"], "vocab": false}, {"uilNum": 1018, "display": "plateau", "acceptable": ["plateau"], "vocab": false}, {"uilNum": 1019, "display": "plethysmograph", "acceptable": ["plethysmograph"], "vocab": false}, {"uilNum": 1020, "display": "plissé, plisse", "acceptable": ["plissé", "plisse"], "vocab": false}, {"uilNum": 1021, "display": "plumbiferous •", "acceptable": ["plumbiferous"], "vocab": false}, {"uilNum": 1022, "display": "pneumonic", "acceptable": ["pneumonic"], "vocab": false}, {"uilNum": 1023, "display": "poetic justice", "acceptable": ["poetic justice"], "vocab": false}, {"uilNum": 1024, "display": "point-blank", "acceptable": ["point-blank"], "vocab": false}, {"uilNum": 1025, "display": "polenta", "acceptable": ["polenta"], "vocab": false}, {"uilNum": 1026, "display": "politicking", "acceptable": ["politicking"], "vocab": false}, {"uilNum": 1027, "display": "polonium", "acceptable": ["polonium"], "vocab": false}, {"uilNum": 1028, "display": "polymath", "acceptable": ["polymath"], "vocab": false}, {"uilNum": 1029, "display": "polysyllabic", "acceptable": ["polysyllabic"], "vocab": false}, {"uilNum": 1030, "display": "pomade", "acceptable": ["pomade"], "vocab": false}, {"uilNum": 1031, "display": "pompano", "acceptable": ["pompano"], "vocab": false}, {"uilNum": 1032, "display": "Pooh-Bah, pooh-bah", "acceptable": ["Pooh-Bah", "pooh-bah"], "vocab": false}, {"uilNum": 1033, "display": "populous", "acceptable": ["populous"], "vocab": false}, {"uilNum": 1034, "display": "porridge", "acceptable": ["porridge"], "vocab": false}, {"uilNum": 1035, "display": "Portsmouth", "acceptable": ["Portsmouth"], "vocab": false}, {"uilNum": 1036, "display": "postdiluvian", "acceptable": ["postdiluvian"], "vocab": false}, {"uilNum": 1037, "display": "posthypnotic suggestion", "acceptable": ["posthypnotic suggestion"], "vocab": false}, {"uilNum": 1038, "display": "postprandial •", "acceptable": ["postprandial"], "vocab": false}, {"uilNum": 1039, "display": "potiche", "acceptable": ["potiche"], "vocab": false}, {"uilNum": 1040, "display": "Prague", "acceptable": ["Prague"], "vocab": false}, {"uilNum": 1041, "display": "praxeology, praxiology", "acceptable": ["praxeology", "praxiology"], "vocab": false}, {"uilNum": 1042, "display": "precatory •", "acceptable": ["precatory"], "vocab": false}, {"uilNum": 1043, "display": "precipitous", "acceptable": ["precipitous"], "vocab": false}, {"uilNum": 1044, "display": "predominance", "acceptable": ["predominance"], "vocab": false}, {"uilNum": 1045, "display": "prefabricate •", "acceptable": ["prefabricate"], "vocab": false}, {"uilNum": 1046, "display": "prelate •", "acceptable": ["prelate"], "vocab": false}, {"uilNum": 1047, "display": "preoccupation", "acceptable": ["preoccupation"], "vocab": false}, {"uilNum": 1048, "display": "prepense", "acceptable": ["prepense"], "vocab": false}, {"uilNum": 1049, "display": "presbyopia", "acceptable": ["presbyopia"], "vocab": false}, {"uilNum": 1050, "display": "presbyter", "acceptable": ["presbyter"], "vocab": false}, {"uilNum": 1051, "display": "presentient", "acceptable": ["presentient"], "vocab": false}, {"uilNum": 1052, "display": "prestigious", "acceptable": ["prestigious"], "vocab": false}, {"uilNum": 1053, "display": "prima ballerina", "acceptable": ["prima ballerina"], "vocab": false}, {"uilNum": 1054, "display": "primipara", "acceptable": ["primipara"], "vocab": false}, {"uilNum": 1055, "display": "primrose path •", "acceptable": ["primrose path"], "vocab": false}, {"uilNum": 1056, "display": "privatization", "acceptable": ["privatization"], "vocab": false}, {"uilNum": 1057, "display": "problematic", "acceptable": ["problematic"], "vocab": false}, {"uilNum": 1058, "display": "Procrustean, procrustean", "acceptable": ["Procrustean", "procrustean"], "vocab": false}, {"uilNum": 1059, "display": "profligacy", "acceptable": ["profligacy"], "vocab": false}, {"uilNum": 1060, "display": "promenade •", "acceptable": ["promenade"], "vocab": false}, {"uilNum": 1061, "display": "pronounceable", "acceptable": ["pronounceable"], "vocab": false}, {"uilNum": 1062, "display": "propaedeutic •", "acceptable": ["propaedeutic"], "vocab": false}, {"uilNum": 1063, "display": "prophesy", "acceptable": ["prophesy"], "vocab": false}, {"uilNum": 1064, "display": "propositus", "acceptable": ["propositus"], "vocab": false}, {"uilNum": 1065, "display": "propriety", "acceptable": ["propriety"], "vocab": false}, {"uilNum": 1066, "display": "prosecute", "acceptable": ["prosecute"], "vocab": false}, {"uilNum": 1067, "display": "proselytizer", "acceptable": ["proselytizer"], "vocab": false}, {"uilNum": 1068, "display": "Protestantism", "acceptable": ["Protestantism"], "vocab": false}, {"uilNum": 1069, "display": "prototype •", "acceptable": ["prototype"], "vocab": false}, {"uilNum": 1070, "display": "provost •", "acceptable": ["provost"], "vocab": false}, {"uilNum": 1071, "display": "psalmist", "acceptable": ["psalmist"], "vocab": false}, {"uilNum": 1072, "display": "psephology", "acceptable": ["psephology"], "vocab": false}, {"uilNum": 1073, "display": "psychobabble •", "acceptable": ["psychobabble"], "vocab": false}, {"uilNum": 1074, "display": "psychrometer", "acceptable": ["psychrometer"], "vocab": false}, {"uilNum": 1075, "display": "pteridology", "acceptable": ["pteridology"], "vocab": false}, {"uilNum": 1076, "display": "Puerto Rico", "acceptable": ["Puerto Rico"], "vocab": false}, {"uilNum": 1077, "display": "pullulate", "acceptable": ["pullulate"], "vocab": false}, {"uilNum": 1078, "display": "Punchinello", "acceptable": ["Punchinello"], "vocab": false}, {"uilNum": 1079, "display": "purificator", "acceptable": ["purificator"], "vocab": false}, {"uilNum": 1080, "display": "purlieu", "acceptable": ["purlieu"], "vocab": false}, {"uilNum": 1081, "display": "pustular", "acceptable": ["pustular"], "vocab": false}, {"uilNum": 1082, "display": "pyracantha, Pyracantha", "acceptable": ["pyracantha", "Pyracantha"], "vocab": false}, {"uilNum": 1083, "display": "pyromania", "acceptable": ["pyromania"], "vocab": false}, {"uilNum": 1084, "display": "Pyrrhic victory", "acceptable": ["Pyrrhic victory"], "vocab": false}, {"uilNum": 1085, "display": "quadratics •", "acceptable": ["quadratics"], "vocab": false}, {"uilNum": 1086, "display": "quadrivium", "acceptable": ["quadrivium"], "vocab": false}, {"uilNum": 1087, "display": "quaich, quaigh", "acceptable": ["quaich", "quaigh"], "vocab": false}, {"uilNum": 1088, "display": "quale", "acceptable": ["quale"], "vocab": false}, {"uilNum": 1089, "display": "quartan", "acceptable": ["quartan"], "vocab": false}, {"uilNum": 1090, "display": "quattrocento •", "acceptable": ["quattrocento"], "vocab": false}, {"uilNum": 1091, "display": "Quebec", "acceptable": ["Quebec"], "vocab": false}, {"uilNum": 1092, "display": "Quetta", "acceptable": ["Quetta"], "vocab": false}, {"uilNum": 1093, "display": "quiche", "acceptable": ["quiche"], "vocab": false}, {"uilNum": 1094, "display": "quiescent •", "acceptable": ["quiescent"], "vocab": false}, {"uilNum": 1095, "display": "quietus", "acceptable": ["quietus"], "vocab": false}, {"uilNum": 1096, "display": "quinquagenarian", "acceptable": ["quinquagenarian"], "vocab": false}, {"uilNum": 1097, "display": "quizzical", "acceptable": ["quizzical"], "vocab": false}, {"uilNum": 1098, "display": "quotability", "acceptable": ["quotability"], "vocab": false}, {"uilNum": 1099, "display": "rabbinical", "acceptable": ["rabbinical"], "vocab": false}, {"uilNum": 1100, "display": "radicalize", "acceptable": ["radicalize"], "vocab": false}, {"uilNum": 1101, "display": "radioecology", "acceptable": ["radioecology"], "vocab": false}, {"uilNum": 1102, "display": "ramada", "acceptable": ["ramada"], "vocab": false}, {"uilNum": 1103, "display": "Rambouillet •", "acceptable": ["Rambouillet"], "vocab": false}, {"uilNum": 1104, "display": "Rankin", "acceptable": ["Rankin"], "vocab": false}, {"uilNum": 1105, "display": "rara avis •", "acceptable": ["rara avis"], "vocab": false}, {"uilNum": 1106, "display": "ratcheting", "acceptable": ["ratcheting"], "vocab": false}, {"uilNum": 1107, "display": "ratification", "acceptable": ["ratification"], "vocab": false}, {"uilNum": 1108, "display": "rationalism", "acceptable": ["rationalism"], "vocab": false}, {"uilNum": 1109, "display": "ravenous", "acceptable": ["ravenous"], "vocab": false}, {"uilNum": 1110, "display": "reactionary", "acceptable": ["reactionary"], "vocab": false}, {"uilNum": 1111, "display": "realignment •", "acceptable": ["realignment"], "vocab": false}, {"uilNum": 1112, "display": "rebuke •", "acceptable": ["rebuke"], "vocab": false}, {"uilNum": 1113, "display": "receivable", "acceptable": ["receivable"], "vocab": false}, {"uilNum": 1114, "display": "recherché •", "acceptable": ["recherché"], "vocab": false}, {"uilNum": 1115, "display": "recipient", "acceptable": ["recipient"], "vocab": false}, {"uilNum": 1116, "display": "recondite", "acceptable": ["recondite"], "vocab": false}, {"uilNum": 1117, "display": "recumbent •", "acceptable": ["recumbent"], "vocab": false}, {"uilNum": 1118, "display": "recusant •", "acceptable": ["recusant"], "vocab": false}, {"uilNum": 1119, "display": "redacted •", "acceptable": ["redacted"], "vocab": false}, {"uilNum": 1120, "display": "redivivus", "acceptable": ["redivivus"], "vocab": false}, {"uilNum": 1121, "display": "redolent •", "acceptable": ["redolent"], "vocab": false}, {"uilNum": 1122, "display": "redundancy", "acceptable": ["redundancy"], "vocab": false}, {"uilNum": 1123, "display": "reentry vehicle", "acceptable": ["reentry vehicle"], "vocab": false}, {"uilNum": 1124, "display": "refluent", "acceptable": ["refluent"], "vocab": false}, {"uilNum": 1125, "display": "refrangible •", "acceptable": ["refrangible"], "vocab": false}, {"uilNum": 1126, "display": "reggae", "acceptable": ["reggae"], "vocab": false}, {"uilNum": 1127, "display": "rehearsal", "acceptable": ["rehearsal"], "vocab": false}, {"uilNum": 1128, "display": "rejigger", "acceptable": ["rejigger"], "vocab": false}, {"uilNum": 1129, "display": "relaxant", "acceptable": ["relaxant"], "vocab": false}, {"uilNum": 1130, "display": "releasable", "acceptable": ["releasable"], "vocab": false}, {"uilNum": 1131, "display": "relegate", "acceptable": ["relegate"], "vocab": false}, {"uilNum": 1132, "display": "remediable", "acceptable": ["remediable"], "vocab": false}, {"uilNum": 1133, "display": "renascence, Renascence", "acceptable": ["renascence", "Renascence"], "vocab": false}, {"uilNum": 1134, "display": "reparations •", "acceptable": ["reparations"], "vocab": false}, {"uilNum": 1135, "display": "repetitious", "acceptable": ["repetitious"], "vocab": false}, {"uilNum": 1136, "display": "reportage", "acceptable": ["reportage"], "vocab": false}, {"uilNum": 1137, "display": "repoussé •", "acceptable": ["repoussé"], "vocab": false}, {"uilNum": 1138, "display": "repressive", "acceptable": ["repressive"], "vocab": false}, {"uilNum": 1139, "display": "requisite •", "acceptable": ["requisite"], "vocab": false}, {"uilNum": 1140, "display": "res publica", "acceptable": ["res publica"], "vocab": false}, {"uilNum": 1141, "display": "residuum •", "acceptable": ["residuum"], "vocab": false}, {"uilNum": 1142, "display": "resilient", "acceptable": ["resilient"], "vocab": false}, {"uilNum": 1143, "display": "restaurateur", "acceptable": ["restaurateur"], "vocab": false}, {"uilNum": 1144, "display": "retiary", "acceptable": ["retiary"], "vocab": false}, {"uilNum": 1145, "display": "retinitis", "acceptable": ["retinitis"], "vocab": false}, {"uilNum": 1146, "display": "retrofit", "acceptable": ["retrofit"], "vocab": false}, {"uilNum": 1147, "display": "revanche •", "acceptable": ["revanche"], "vocab": false}, {"uilNum": 1148, "display": "reverberant •", "acceptable": ["reverberant"], "vocab": false}, {"uilNum": 1149, "display": "reverse osmosis", "acceptable": ["reverse osmosis"], "vocab": false}, {"uilNum": 1150, "display": "Reye's syndrome", "acceptable": ["Reye's syndrome"], "vocab": false}, {"uilNum": 1151, "display": "rheology", "acceptable": ["rheology"], "vocab": false}, {"uilNum": 1152, "display": "rhetorical question", "acceptable": ["rhetorical question"], "vocab": false}, {"uilNum": 1153, "display": "rhinopharyngitis", "acceptable": ["rhinopharyngitis"], "vocab": false}, {"uilNum": 1154, "display": "rhomboid", "acceptable": ["rhomboid"], "vocab": false}, {"uilNum": 1155, "display": "rhytidectomy", "acceptable": ["rhytidectomy"], "vocab": false}, {"uilNum": 1156, "display": "Riggs' disease •", "acceptable": ["Riggs' disease"], "vocab": false}, {"uilNum": 1157, "display": "rigidity", "acceptable": ["rigidity"], "vocab": false}, {"uilNum": 1158, "display": "rigorously •", "acceptable": ["rigorously"], "vocab": false}, {"uilNum": 1159, "display": "Rijeka", "acceptable": ["Rijeka"], "vocab": false}, {"uilNum": 1160, "display": "risqué •", "acceptable": ["risqué"], "vocab": false}, {"uilNum": 1161, "display": "rivière", "acceptable": ["rivière"], "vocab": false}, {"uilNum": 1162, "display": "roebuck", "acceptable": ["roebuck"], "vocab": false}, {"uilNum": 1163, "display": "roisterous", "acceptable": ["roisterous"], "vocab": false}, {"uilNum": 1164, "display": "Romaic •", "acceptable": ["Romaic"], "vocab": false}, {"uilNum": 1165, "display": "romanticism, Romanticism", "acceptable": ["romanticism", "Romanticism"], "vocab": false}, {"uilNum": 1166, "display": "Roquefort (trademark)", "acceptable": ["Roquefort"], "vocab": false}, {"uilNum": 1167, "display": "rose of Jericho", "acceptable": ["rose of Jericho"], "vocab": false}, {"uilNum": 1168, "display": "Rosetta stone", "acceptable": ["Rosetta stone"], "vocab": false}, {"uilNum": 1169, "display": "rototiller •", "acceptable": ["rototiller"], "vocab": false}, {"uilNum": 1170, "display": "Rottweiler", "acceptable": ["Rottweiler"], "vocab": false}, {"uilNum": 1171, "display": "rubbernecker", "acceptable": ["rubbernecker"], "vocab": false}, {"uilNum": 1172, "display": "rubricate •", "acceptable": ["rubricate"], "vocab": false}, {"uilNum": 1173, "display": "rueful •", "acceptable": ["rueful"], "vocab": false}, {"uilNum": 1174, "display": "rufous", "acceptable": ["rufous"], "vocab": false}, {"uilNum": 1175, "display": "rumination", "acceptable": ["rumination"], "vocab": false}, {"uilNum": 1176, "display": "Ruritanian", "acceptable": ["Ruritanian"], "vocab": false}, {"uilNum": 1177, "display": "rusticate •", "acceptable": ["rusticate"], "vocab": false}, {"uilNum": 1178, "display": "saber-toothed tiger", "acceptable": ["saber-toothed tiger"], "vocab": false}, {"uilNum": 1179, "display": "saccate •", "acceptable": ["saccate"], "vocab": false}, {"uilNum": 1180, "display": "Sacramentarian", "acceptable": ["Sacramentarian"], "vocab": false}, {"uilNum": 1181, "display": "sacrosanct •", "acceptable": ["sacrosanct"], "vocab": false}, {"uilNum": 1182, "display": "Sagittarius", "acceptable": ["Sagittarius"], "vocab": false}, {"uilNum": 1183, "display": "Saint Croix", "acceptable": ["Saint Croix"], "vocab": false}, {"uilNum": 1184, "display": "Saint-Lô", "acceptable": ["Saint-Lô"], "vocab": false}, {"uilNum": 1185, "display": "salamander", "acceptable": ["salamander"], "vocab": false}, {"uilNum": 1186, "display": "salient", "acceptable": ["salient"], "vocab": false}, {"uilNum": 1187, "display": "salimeter •", "acceptable": ["salimeter"], "vocab": false}, {"uilNum": 1188, "display": "salmonella, Salmonella", "acceptable": ["salmonella", "Salmonella"], "vocab": false}, {"uilNum": 1189, "display": "saluki", "acceptable": ["saluki"], "vocab": false}, {"uilNum": 1190, "display": "salvable", "acceptable": ["salvable"], "vocab": false}, {"uilNum": 1191, "display": "Salvationist, salvationist", "acceptable": ["Salvationist", "salvationist"], "vocab": false}, {"uilNum": 1192, "display": "sambaed", "acceptable": ["sambaed"], "vocab": false}, {"uilNum": 1193, "display": "sanatorium", "acceptable": ["sanatorium"], "vocab": false}, {"uilNum": 1194, "display": "sanguinary", "acceptable": ["sanguinary"], "vocab": false}, {"uilNum": 1195, "display": "Sanhedrin", "acceptable": ["Sanhedrin"], "vocab": false}, {"uilNum": 1196, "display": "sans-culotte", "acceptable": ["sans-culotte"], "vocab": false}, {"uilNum": 1197, "display": "sapience •", "acceptable": ["sapience"], "vocab": false}, {"uilNum": 1198, "display": "saprophagous", "acceptable": ["saprophagous"], "vocab": false}, {"uilNum": 1199, "display": "sarcoma", "acceptable": ["sarcoma"], "vocab": false}, {"uilNum": 1200, "display": "sarcopterygian", "acceptable": ["sarcopterygian"], "vocab": false}, {"uilNum": 1201, "display": "sardonyx", "acceptable": ["sardonyx"], "vocab": false}, {"uilNum": 1202, "display": "satinwood", "acceptable": ["satinwood"], "vocab": false}, {"uilNum": 1203, "display": "Saudi Arabia", "acceptable": ["Saudi Arabia"], "vocab": false}, {"uilNum": 1204, "display": "saurischian", "acceptable": ["saurischian"], "vocab": false}, {"uilNum": 1205, "display": "savagery", "acceptable": ["savagery"], "vocab": false}, {"uilNum": 1206, "display": "scalawag", "acceptable": ["scalawag"], "vocab": false}, {"uilNum": 1207, "display": "scallion", "acceptable": ["scallion"], "vocab": false}, {"uilNum": 1208, "display": "scansion", "acceptable": ["scansion"], "vocab": false}, {"uilNum": 1209, "display": "Scarborough", "acceptable": ["Scarborough"], "vocab": false}, {"uilNum": 1210, "display": "schematize", "acceptable": ["schematize"], "vocab": false}, {"uilNum": 1211, "display": "schmaltzy", "acceptable": ["schmaltzy"], "vocab": false}, {"uilNum": 1212, "display": "schussing", "acceptable": ["schussing"], "vocab": false}, {"uilNum": 1213, "display": "sciolism", "acceptable": ["sciolism"], "vocab": false}, {"uilNum": 1214, "display": "scoliosis •", "acceptable": ["scoliosis"], "vocab": false}, {"uilNum": 1215, "display": "scree", "acceptable": ["scree"], "vocab": false}, {"uilNum": 1216, "display": "scrutable •", "acceptable": ["scrutable"], "vocab": false}, {"uilNum": 1217, "display": "seafaring", "acceptable": ["seafaring"], "vocab": false}, {"uilNum": 1218, "display": "secessionism •", "acceptable": ["secessionism"], "vocab": false}, {"uilNum": 1219, "display": "secular humanism", "acceptable": ["secular humanism"], "vocab": false}, {"uilNum": 1220, "display": "sedimentology •", "acceptable": ["sedimentology"], "vocab": false}, {"uilNum": 1221, "display": "seigniorage", "acceptable": ["seigniorage"], "vocab": false}, {"uilNum": 1222, "display": "seleniferous", "acceptable": ["seleniferous"], "vocab": false}, {"uilNum": 1223, "display": "self-effacing", "acceptable": ["self-effacing"], "vocab": false}, {"uilNum": 1224, "display": "self-indulgence", "acceptable": ["self-indulgence"], "vocab": false}, {"uilNum": 1225, "display": "semiautonomous", "acceptable": ["semiautonomous"], "vocab": false}, {"uilNum": 1226, "display": "seminar", "acceptable": ["seminar"], "vocab": false}, {"uilNum": 1227, "display": "semiterrestrial", "acceptable": ["semiterrestrial"], "vocab": false}, {"uilNum": 1228, "display": "semplice •", "acceptable": ["semplice"], "vocab": false}, {"uilNum": 1229, "display": "sententious", "acceptable": ["sententious"], "vocab": false}, {"uilNum": 1230, "display": "Septuagesima •", "acceptable": ["Septuagesima"], "vocab": false}, {"uilNum": 1231, "display": "sequestrate", "acceptable": ["sequestrate"], "vocab": false}, {"uilNum": 1232, "display": "sequined", "acceptable": ["sequined"], "vocab": false}, {"uilNum": 1233, "display": "seroconversion", "acceptable": ["seroconversion"], "vocab": false}, {"uilNum": 1234, "display": "serpentarium", "acceptable": ["serpentarium"], "vocab": false}, {"uilNum": 1235, "display": "severable", "acceptable": ["severable"], "vocab": false}, {"uilNum": 1236, "display": "Seychelles", "acceptable": ["Seychelles"], "vocab": false}, {"uilNum": 1237, "display": "shabu-shabu", "acceptable": ["shabu-shabu"], "vocab": false}, {"uilNum": 1238, "display": "shaman", "acceptable": ["shaman"], "vocab": false}, {"uilNum": 1239, "display": "shareholder", "acceptable": ["shareholder"], "vocab": false}, {"uilNum": 1240, "display": "shea butter", "acceptable": ["shea butter"], "vocab": false}, {"uilNum": 1241, "display": "sheldrake •", "acceptable": ["sheldrake"], "vocab": false}, {"uilNum": 1242, "display": "shibboleth", "acceptable": ["shibboleth"], "vocab": false}, {"uilNum": 1243, "display": "shuttle diplomacy", "acceptable": ["shuttle diplomacy"], "vocab": false}, {"uilNum": 1244, "display": "sibilant", "acceptable": ["sibilant"], "vocab": false}, {"uilNum": 1245, "display": "Sierra Leone", "acceptable": ["Sierra Leone"], "vocab": false}, {"uilNum": 1246, "display": "siliceous", "acceptable": ["siliceous"], "vocab": false}, {"uilNum": 1247, "display": "simile", "acceptable": ["simile"], "vocab": false}, {"uilNum": 1248, "display": "Simmental, Simmenthal", "acceptable": ["Simmental", "Simmenthal"], "vocab": false}, {"uilNum": 1249, "display": "Simon Legree", "acceptable": ["Simon Legree"], "vocab": false}, {"uilNum": 1250, "display": "simony", "acceptable": ["simony"], "vocab": false}, {"uilNum": 1251, "display": "simulation •", "acceptable": ["simulation"], "vocab": false}, {"uilNum": 1252, "display": "Sinicize", "acceptable": ["Sinicize"], "vocab": false}, {"uilNum": 1253, "display": "Sinophile", "acceptable": ["Sinophile"], "vocab": false}, {"uilNum": 1254, "display": "sitzkrieg •", "acceptable": ["sitzkrieg"], "vocab": false}, {"uilNum": 1255, "display": "skedaddle", "acceptable": ["skedaddle"], "vocab": false}, {"uilNum": 1256, "display": "skipjack •", "acceptable": ["skipjack"], "vocab": false}, {"uilNum": 1257, "display": "sledgehammer", "acceptable": ["sledgehammer"], "vocab": false}, {"uilNum": 1258, "display": "sleuthhound", "acceptable": ["sleuthhound"], "vocab": false}, {"uilNum": 1259, "display": "smarmy •", "acceptable": ["smarmy"], "vocab": false}, {"uilNum": 1260, "display": "snifter", "acceptable": ["snifter"], "vocab": false}, {"uilNum": 1261, "display": "socioeconomic", "acceptable": ["socioeconomic"], "vocab": false}, {"uilNum": 1262, "display": "sojourned", "acceptable": ["sojourned"], "vocab": false}, {"uilNum": 1263, "display": "solatium", "acceptable": ["solatium"], "vocab": false}, {"uilNum": 1264, "display": "solicitude •", "acceptable": ["solicitude"], "vocab": false}, {"uilNum": 1265, "display": "solvent", "acceptable": ["solvent"], "vocab": false}, {"uilNum": 1266, "display": "Somalia", "acceptable": ["Somalia"], "vocab": false}, {"uilNum": 1267, "display": "somnambulated •", "acceptable": ["somnambulated"], "vocab": false}, {"uilNum": 1268, "display": "sonogram", "acceptable": ["sonogram"], "vocab": false}, {"uilNum": 1269, "display": "sophistical", "acceptable": ["sophistical"], "vocab": false}, {"uilNum": 1270, "display": "sortation", "acceptable": ["sortation"], "vocab": false}, {"uilNum": 1271, "display": "sotto voce", "acceptable": ["sotto voce"], "vocab": false}, {"uilNum": 1272, "display": "space sickness", "acceptable": ["space sickness"], "vocab": false}, {"uilNum": 1273, "display": "Spaniard", "acceptable": ["Spaniard"], "vocab": false}, {"uilNum": 1274, "display": "spareribs", "acceptable": ["spareribs"], "vocab": false}, {"uilNum": 1275, "display": "spear-carrier •", "acceptable": ["spear-carrier"], "vocab": false}, {"uilNum": 1276, "display": "specifiable", "acceptable": ["specifiable"], "vocab": false}, {"uilNum": 1277, "display": "spelunker •", "acceptable": ["spelunker"], "vocab": false}, {"uilNum": 1278, "display": "sphenogram", "acceptable": ["sphenogram"], "vocab": false}, {"uilNum": 1279, "display": "sphragistics", "acceptable": ["sphragistics"], "vocab": false}, {"uilNum": 1280, "display": "spinnaker", "acceptable": ["spinnaker"], "vocab": false}, {"uilNum": 1281, "display": "spondylosis •", "acceptable": ["spondylosis"], "vocab": false}, {"uilNum": 1282, "display": "spurious", "acceptable": ["spurious"], "vocab": false}, {"uilNum": 1283, "display": "standardization", "acceptable": ["standardization"], "vocab": false}, {"uilNum": 1284, "display": "staphylorrhaphy, staphyloraphy", "acceptable": ["staphylorrhaphy", "staphyloraphy"], "vocab": false}, {"uilNum": 1285, "display": "starboard", "acceptable": ["starboard"], "vocab": false}, {"uilNum": 1286, "display": "statuesque", "acceptable": ["statuesque"], "vocab": false}, {"uilNum": 1287, "display": "stem cell", "acceptable": ["stem cell"], "vocab": false}, {"uilNum": 1288, "display": "sterlet", "acceptable": ["sterlet"], "vocab": false}, {"uilNum": 1289, "display": "sthenia •", "acceptable": ["sthenia"], "vocab": false}, {"uilNum": 1290, "display": "stipendiary", "acceptable": ["stipendiary"], "vocab": false}, {"uilNum": 1291, "display": "stockade", "acceptable": ["stockade"], "vocab": false}, {"uilNum": 1292, "display": "stogy, stogie", "acceptable": ["stogy", "stogie"], "vocab": false}, {"uilNum": 1293, "display": "stonemason", "acceptable": ["stonemason"], "vocab": false}, {"uilNum": 1294, "display": "strangulation", "acceptable": ["strangulation"], "vocab": false}, {"uilNum": 1295, "display": "strategize", "acceptable": ["strategize"], "vocab": false}, {"uilNum": 1296, "display": "straticulate", "acceptable": ["straticulate"], "vocab": false}, {"uilNum": 1297, "display": "strigose", "acceptable": ["strigose"], "vocab": false}, {"uilNum": 1298, "display": "stupefy •", "acceptable": ["stupefy"], "vocab": false}, {"uilNum": 1299, "display": "Stuttgart", "acceptable": ["Stuttgart"], "vocab": false}, {"uilNum": 1300, "display": "styptic •", "acceptable": ["styptic"], "vocab": false}, {"uilNum": 1301, "display": "subaltern", "acceptable": ["subaltern"], "vocab": false}, {"uilNum": 1302, "display": "subdural •", "acceptable": ["subdural"], "vocab": false}, {"uilNum": 1303, "display": "submissiveness", "acceptable": ["submissiveness"], "vocab": false}, {"uilNum": 1304, "display": "subpoena •", "acceptable": ["subpoena"], "vocab": false}, {"uilNum": 1305, "display": "subsidy", "acceptable": ["subsidy"], "vocab": false}, {"uilNum": 1306, "display": "sufficiency •", "acceptable": ["sufficiency"], "vocab": false}, {"uilNum": 1307, "display": "sukiyaki", "acceptable": ["sukiyaki"], "vocab": false}, {"uilNum": 1308, "display": "sumptuary", "acceptable": ["sumptuary"], "vocab": false}, {"uilNum": 1309, "display": "supereminent •", "acceptable": ["supereminent"], "vocab": false}, {"uilNum": 1310, "display": "supplicate •", "acceptable": ["supplicate"], "vocab": false}, {"uilNum": 1311, "display": "Suquamish", "acceptable": ["Suquamish"], "vocab": false}, {"uilNum": 1312, "display": "survivable", "acceptable": ["survivable"], "vocab": false}, {"uilNum": 1313, "display": "sutler", "acceptable": ["sutler"], "vocab": false}, {"uilNum": 1314, "display": "suzerain •", "acceptable": ["suzerain"], "vocab": false}, {"uilNum": 1315, "display": "swordfish", "acceptable": ["swordfish"], "vocab": false}, {"uilNum": 1316, "display": "sybaritic, Sybaritic", "acceptable": ["sybaritic", "Sybaritic"], "vocab": false}, {"uilNum": 1317, "display": "symmetry •", "acceptable": ["symmetry"], "vocab": false}, {"uilNum": 1318, "display": "synalepha, synaloepha", "acceptable": ["synalepha", "synaloepha"], "vocab": false}, {"uilNum": 1319, "display": "synchronicity •", "acceptable": ["synchronicity"], "vocab": false}, {"uilNum": 1320, "display": "syndicate", "acceptable": ["syndicate"], "vocab": false}, {"uilNum": 1321, "display": "synesthesia, synaesthesia", "acceptable": ["synesthesia", "synaesthesia"], "vocab": false}, {"uilNum": 1322, "display": "synod", "acceptable": ["synod"], "vocab": false}, {"uilNum": 1323, "display": "tabescent", "acceptable": ["tabescent"], "vocab": false}, {"uilNum": 1324, "display": "tachycardia •", "acceptable": ["tachycardia"], "vocab": false}, {"uilNum": 1325, "display": "taffrail", "acceptable": ["taffrail"], "vocab": false}, {"uilNum": 1326, "display": "taiga •", "acceptable": ["taiga"], "vocab": false}, {"uilNum": 1327, "display": "talipes •", "acceptable": ["talipes"], "vocab": false}, {"uilNum": 1328, "display": "talus •", "acceptable": ["talus"], "vocab": false}, {"uilNum": 1329, "display": "tankard", "acceptable": ["tankard"], "vocab": false}, {"uilNum": 1330, "display": "taphonomy •", "acceptable": ["taphonomy"], "vocab": false}, {"uilNum": 1331, "display": "targetable", "acceptable": ["targetable"], "vocab": false}, {"uilNum": 1332, "display": "tattersall, Tattersall", "acceptable": ["tattersall", "Tattersall"], "vocab": false}, {"uilNum": 1333, "display": "teapoy", "acceptable": ["teapoy"], "vocab": false}, {"uilNum": 1334, "display": "Teflon (trademark)", "acceptable": ["Teflon"], "vocab": false}, {"uilNum": 1335, "display": "telekinesis", "acceptable": ["telekinesis"], "vocab": false}, {"uilNum": 1336, "display": "telescopy", "acceptable": ["telescopy"], "vocab": false}, {"uilNum": 1337, "display": "temerarious •", "acceptable": ["temerarious"], "vocab": false}, {"uilNum": 1338, "display": "tenantry", "acceptable": ["tenantry"], "vocab": false}, {"uilNum": 1339, "display": "tendril", "acceptable": ["tendril"], "vocab": false}, {"uilNum": 1340, "display": "tentacles", "acceptable": ["tentacles"], "vocab": false}, {"uilNum": 1341, "display": "tenuto", "acceptable": ["tenuto"], "vocab": false}, {"uilNum": 1342, "display": "teocalli", "acceptable": ["teocalli"], "vocab": false}, {"uilNum": 1343, "display": "termitarium", "acceptable": ["termitarium"], "vocab": false}, {"uilNum": 1344, "display": "terrapin", "acceptable": ["terrapin"], "vocab": false}, {"uilNum": 1345, "display": "territorialism •", "acceptable": ["territorialism"], "vocab": false}, {"uilNum": 1346, "display": "tetramerous •", "acceptable": ["tetramerous"], "vocab": false}, {"uilNum": 1347, "display": "thalassemia", "acceptable": ["thalassemia"], "vocab": false}, {"uilNum": 1348, "display": "Thames", "acceptable": ["Thames"], "vocab": false}, {"uilNum": 1349, "display": "theanthropism", "acceptable": ["theanthropism"], "vocab": false}, {"uilNum": 1350, "display": "theodolite", "acceptable": ["theodolite"], "vocab": false}, {"uilNum": 1351, "display": "theogony •", "acceptable": ["theogony"], "vocab": false}, {"uilNum": 1352, "display": "thermesthesia", "acceptable": ["thermesthesia"], "vocab": false}, {"uilNum": 1353, "display": "Third World, third world", "acceptable": ["Third World", "third world"], "vocab": false}, {"uilNum": 1354, "display": "thoracotomy", "acceptable": ["thoracotomy"], "vocab": false}, {"uilNum": 1355, "display": "Thucydides", "acceptable": ["Thucydides"], "vocab": false}, {"uilNum": 1356, "display": "Tiahuanaco", "acceptable": ["Tiahuanaco"], "vocab": false}, {"uilNum": 1357, "display": "tilde •", "acceptable": ["tilde"], "vocab": false}, {"uilNum": 1358, "display": "tintinnabulation •", "acceptable": ["tintinnabulation"], "vocab": false}, {"uilNum": 1359, "display": "tirade", "acceptable": ["tirade"], "vocab": false}, {"uilNum": 1360, "display": "toccata", "acceptable": ["toccata"], "vocab": false}, {"uilNum": 1361, "display": "toiletries", "acceptable": ["toiletries"], "vocab": false}, {"uilNum": 1362, "display": "tombé", "acceptable": ["tombé"], "vocab": false}, {"uilNum": 1363, "display": "tongue-tied", "acceptable": ["tongue-tied"], "vocab": false}, {"uilNum": 1364, "display": "tonsorial •", "acceptable": ["tonsorial"], "vocab": false}, {"uilNum": 1365, "display": "topiary", "acceptable": ["topiary"], "vocab": false}, {"uilNum": 1366, "display": "Torquemada •", "acceptable": ["Torquemada"], "vocab": false}, {"uilNum": 1367, "display": "tour de force (singular)", "acceptable": ["tour de force"], "vocab": false}, {"uilNum": 1368, "display": "tragopan, Tragopan", "acceptable": ["tragopan", "Tragopan"], "vocab": false}, {"uilNum": 1369, "display": "transalpine", "acceptable": ["transalpine"], "vocab": false}, {"uilNum": 1370, "display": "transponder", "acceptable": ["transponder"], "vocab": false}, {"uilNum": 1371, "display": "trefoil", "acceptable": ["trefoil"], "vocab": false}, {"uilNum": 1372, "display": "triangulation", "acceptable": ["triangulation"], "vocab": false}, {"uilNum": 1373, "display": "trichinosis •", "acceptable": ["trichinosis"], "vocab": false}, {"uilNum": 1374, "display": "trigger-happy", "acceptable": ["trigger-happy"], "vocab": false}, {"uilNum": 1375, "display": "trimerous", "acceptable": ["trimerous"], "vocab": false}, {"uilNum": 1376, "display": "tritium •", "acceptable": ["tritium"], "vocab": false}, {"uilNum": 1377, "display": "triune", "acceptable": ["triune"], "vocab": false}, {"uilNum": 1378, "display": "troubadour", "acceptable": ["troubadour"], "vocab": false}, {"uilNum": 1379, "display": "truncated", "acceptable": ["truncated"], "vocab": false}, {"uilNum": 1380, "display": "tryptophan", "acceptable": ["tryptophan"], "vocab": false}, {"uilNum": 1381, "display": "turbid", "acceptable": ["turbid"], "vocab": false}, {"uilNum": 1382, "display": "turpitude", "acceptable": ["turpitude"], "vocab": false}, {"uilNum": 1383, "display": "turreted", "acceptable": ["turreted"], "vocab": false}, {"uilNum": 1384, "display": "uakari •", "acceptable": ["uakari"], "vocab": false}, {"uilNum": 1385, "display": "ubuntu", "acceptable": ["ubuntu"], "vocab": false}, {"uilNum": 1386, "display": "ultraism", "acceptable": ["ultraism"], "vocab": false}, {"uilNum": 1387, "display": "ultraliberal", "acceptable": ["ultraliberal"], "vocab": false}, {"uilNum": 1388, "display": "umiak, oomiak", "acceptable": ["umiak", "oomiak"], "vocab": false}, {"uilNum": 1389, "display": "unabashed", "acceptable": ["unabashed"], "vocab": false}, {"uilNum": 1390, "display": "unappropriated •", "acceptable": ["unappropriated"], "vocab": false}, {"uilNum": 1391, "display": "unbudging", "acceptable": ["unbudging"], "vocab": false}, {"uilNum": 1392, "display": "unchallengeable", "acceptable": ["unchallengeable"], "vocab": false}, {"uilNum": 1393, "display": "undeniable", "acceptable": ["undeniable"], "vocab": false}, {"uilNum": 1394, "display": "undercarriage", "acceptable": ["undercarriage"], "vocab": false}, {"uilNum": 1395, "display": "underling", "acceptable": ["underling"], "vocab": false}, {"uilNum": 1396, "display": "unfathomable •", "acceptable": ["unfathomable"], "vocab": false}, {"uilNum": 1397, "display": "unformatted", "acceptable": ["unformatted"], "vocab": false}, {"uilNum": 1398, "display": "unguent", "acceptable": ["unguent"], "vocab": false}, {"uilNum": 1399, "display": "unidirectional", "acceptable": ["unidirectional"], "vocab": false}, {"uilNum": 1400, "display": "unipotent •", "acceptable": ["unipotent"], "vocab": false}, {"uilNum": 1401, "display": "universalistic •", "acceptable": ["universalistic"], "vocab": false}, {"uilNum": 1402, "display": "univocal", "acceptable": ["univocal"], "vocab": false}, {"uilNum": 1403, "display": "unpronounceable", "acceptable": ["unpronounceable"], "vocab": false}, {"uilNum": 1404, "display": "unsolicited •", "acceptable": ["unsolicited"], "vocab": false}, {"uilNum": 1405, "display": "unstriated", "acceptable": ["unstriated"], "vocab": false}, {"uilNum": 1406, "display": "unsubstantial", "acceptable": ["unsubstantial"], "vocab": false}, {"uilNum": 1407, "display": "unwearied", "acceptable": ["unwearied"], "vocab": false}, {"uilNum": 1408, "display": "up-to-the-minute", "acceptable": ["up-to-the-minute"], "vocab": false}, {"uilNum": 1409, "display": "urban forest", "acceptable": ["urban forest"], "vocab": false}, {"uilNum": 1410, "display": "urticaria •", "acceptable": ["urticaria"], "vocab": false}, {"uilNum": 1411, "display": "usurious", "acceptable": ["usurious"], "vocab": false}, {"uilNum": 1412, "display": "Uxmal", "acceptable": ["Uxmal"], "vocab": false}, {"uilNum": 1413, "display": "vacationland", "acceptable": ["vacationland"], "vocab": false}, {"uilNum": 1414, "display": "valance", "acceptable": ["valance"], "vocab": false}, {"uilNum": 1415, "display": "vallation •", "acceptable": ["vallation"], "vocab": false}, {"uilNum": 1416, "display": "valvuloplasty", "acceptable": ["valvuloplasty"], "vocab": false}, {"uilNum": 1417, "display": "van Gogh", "acceptable": ["van Gogh"], "vocab": false}, {"uilNum": 1418, "display": "vanguard •", "acceptable": ["vanguard"], "vocab": false}, {"uilNum": 1419, "display": "vaporware", "acceptable": ["vaporware"], "vocab": false}, {"uilNum": 1420, "display": "variegated (adj)", "acceptable": ["variegated"], "vocab": false}, {"uilNum": 1421, "display": "vasculature", "acceptable": ["vasculature"], "vocab": false}, {"uilNum": 1422, "display": "Vatican", "acceptable": ["Vatican"], "vocab": false}, {"uilNum": 1423, "display": "veldt, veld", "acceptable": ["veldt", "veld"], "vocab": false}, {"uilNum": 1424, "display": "vendible, vendable", "acceptable": ["vendible", "vendable"], "vocab": false}, {"uilNum": 1425, "display": "ventriloquism", "acceptable": ["ventriloquism"], "vocab": false}, {"uilNum": 1426, "display": "veracious •", "acceptable": ["veracious"], "vocab": false}, {"uilNum": 1427, "display": "veranda, verandah", "acceptable": ["veranda", "verandah"], "vocab": false}, {"uilNum": 1428, "display": "Vercingetorix", "acceptable": ["Vercingetorix"], "vocab": false}, {"uilNum": 1429, "display": "verderer, verderor", "acceptable": ["verderer", "verderor"], "vocab": false}, {"uilNum": 1430, "display": "vermivorous", "acceptable": ["vermivorous"], "vocab": false}, {"uilNum": 1431, "display": "vernier caliper", "acceptable": ["vernier caliper"], "vocab": false}, {"uilNum": 1432, "display": "vesicant", "acceptable": ["vesicant"], "vocab": false}, {"uilNum": 1433, "display": "Vesuvius", "acceptable": ["Vesuvius"], "vocab": false}, {"uilNum": 1434, "display": "Via Dolorosa", "acceptable": ["Via Dolorosa"], "vocab": false}, {"uilNum": 1435, "display": "vicarage", "acceptable": ["vicarage"], "vocab": false}, {"uilNum": 1436, "display": "vichyssoise •", "acceptable": ["vichyssoise"], "vocab": false}, {"uilNum": 1437, "display": "vicious circle", "acceptable": ["vicious circle"], "vocab": false}, {"uilNum": 1438, "display": "videoconference", "acceptable": ["videoconference"], "vocab": false}, {"uilNum": 1439, "display": "view halloo •", "acceptable": ["view halloo"], "vocab": false}, {"uilNum": 1440, "display": "vinaigrette", "acceptable": ["vinaigrette"], "vocab": false}, {"uilNum": 1441, "display": "vindictiveness", "acceptable": ["vindictiveness"], "vocab": false}, {"uilNum": 1442, "display": "Virginia reel", "acceptable": ["Virginia reel"], "vocab": false}, {"uilNum": 1443, "display": "virgule •", "acceptable": ["virgule"], "vocab": false}, {"uilNum": 1444, "display": "viscacha, vizcacha", "acceptable": ["viscacha", "vizcacha"], "vocab": false}, {"uilNum": 1445, "display": "visual acuity", "acceptable": ["visual acuity"], "vocab": false}, {"uilNum": 1446, "display": "vituperation", "acceptable": ["vituperation"], "vocab": false}, {"uilNum": 1447, "display": "voguish", "acceptable": ["voguish"], "vocab": false}, {"uilNum": 1448, "display": "voluntarism", "acceptable": ["voluntarism"], "vocab": false}, {"uilNum": 1449, "display": "voluptuous", "acceptable": ["voluptuous"], "vocab": false}, {"uilNum": 1450, "display": "voyageur", "acceptable": ["voyageur"], "vocab": false}, {"uilNum": 1451, "display": "vuvuzela", "acceptable": ["vuvuzela"], "vocab": false}, {"uilNum": 1452, "display": "wagon-lit (singular)", "acceptable": ["wagon-lit"], "vocab": false}, {"uilNum": 1453, "display": "wait-a-bit •", "acceptable": ["wait-a-bit"], "vocab": false}, {"uilNum": 1454, "display": "wallah, walla", "acceptable": ["wallah", "walla"], "vocab": false}, {"uilNum": 1455, "display": "Wankel engine", "acceptable": ["Wankel engine"], "vocab": false}, {"uilNum": 1456, "display": "wantonness", "acceptable": ["wantonness"], "vocab": false}, {"uilNum": 1457, "display": "warrener", "acceptable": ["warrener"], "vocab": false}, {"uilNum": 1458, "display": "wattle and daub", "acceptable": ["wattle and daub"], "vocab": false}, {"uilNum": 1459, "display": "weather-beaten", "acceptable": ["weather-beaten"], "vocab": false}, {"uilNum": 1460, "display": "well-intentioned", "acceptable": ["well-intentioned"], "vocab": false}, {"uilNum": 1461, "display": "whey-face •", "acceptable": ["whey-face"], "vocab": false}, {"uilNum": 1462, "display": "whipstall", "acceptable": ["whipstall"], "vocab": false}, {"uilNum": 1463, "display": "widdershins •", "acceptable": ["widdershins"], "vocab": false}, {"uilNum": 1464, "display": "wind-chill factor", "acceptable": ["wind-chill factor"], "vocab": false}, {"uilNum": 1465, "display": "wizened", "acceptable": ["wizened"], "vocab": false}, {"uilNum": 1466, "display": "woefulness", "acceptable": ["woefulness"], "vocab": false}, {"uilNum": 1467, "display": "woomera", "acceptable": ["woomera"], "vocab": false}, {"uilNum": 1468, "display": "work-study (adj)", "acceptable": ["work-study"], "vocab": false}, {"uilNum": 1469, "display": "Wovoka", "acceptable": ["Wovoka"], "vocab": false}, {"uilNum": 1470, "display": "wreath", "acceptable": ["wreath"], "vocab": false}, {"uilNum": 1471, "display": "wretchedly •", "acceptable": ["wretchedly"], "vocab": false}, {"uilNum": 1472, "display": "wryness •", "acceptable": ["wryness"], "vocab": false}, {"uilNum": 1473, "display": "Wuhan", "acceptable": ["Wuhan"], "vocab": false}, {"uilNum": 1474, "display": "wyvern, wivern •", "acceptable": ["wyvern", "wivern"], "vocab": false}, {"uilNum": 1475, "display": "xanthopterin •", "acceptable": ["xanthopterin"], "vocab": false}, {"uilNum": 1476, "display": "Xaverian Brother", "acceptable": ["Xaverian Brother"], "vocab": false}, {"uilNum": 1477, "display": "xenogeneic", "acceptable": ["xenogeneic"], "vocab": false}, {"uilNum": 1478, "display": "Xingu", "acceptable": ["Xingu"], "vocab": false}, {"uilNum": 1479, "display": "xoloitzcuintli, xoloitzcuintle", "acceptable": ["xoloitzcuintli", "xoloitzcuintle"], "vocab": false}, {"uilNum": 1480, "display": "xylene", "acceptable": ["xylene"], "vocab": false}, {"uilNum": 1481, "display": "yagi", "acceptable": ["yagi"], "vocab": false}, {"uilNum": 1482, "display": "Yankeeism", "acceptable": ["Yankeeism"], "vocab": false}, {"uilNum": 1483, "display": "yashmak, yashmac", "acceptable": ["yashmak", "yashmac"], "vocab": false}, {"uilNum": 1484, "display": "Yeats •", "acceptable": ["Yeats"], "vocab": false}, {"uilNum": 1485, "display": "Yellowknife", "acceptable": ["Yellowknife"], "vocab": false}, {"uilNum": 1486, "display": "yenta", "acceptable": ["yenta"], "vocab": false}, {"uilNum": 1487, "display": "Yerkish", "acceptable": ["Yerkish"], "vocab": false}, {"uilNum": 1488, "display": "yoicks", "acceptable": ["yoicks"], "vocab": false}, {"uilNum": 1489, "display": "yukata •", "acceptable": ["yukata"], "vocab": false}, {"uilNum": 1490, "display": "Yuman", "acceptable": ["Yuman"], "vocab": false}, {"uilNum": 1491, "display": "zabaglione", "acceptable": ["zabaglione"], "vocab": false}, {"uilNum": 1492, "display": "Zambezi •", "acceptable": ["Zambezi"], "vocab": false}, {"uilNum": 1493, "display": "zealotry", "acceptable": ["zealotry"], "vocab": false}, {"uilNum": 1494, "display": "zeitgeber •", "acceptable": ["zeitgeber"], "vocab": false}, {"uilNum": 1495, "display": "zero gravity", "acceptable": ["zero gravity"], "vocab": false}, {"uilNum": 1496, "display": "zeugma •", "acceptable": ["zeugma"], "vocab": false}, {"uilNum": 1497, "display": "Zipf’s law", "acceptable": ["Zipf’s law"], "vocab": false}, {"uilNum": 1498, "display": "ziti", "acceptable": ["ziti"], "vocab": false}, {"uilNum": 1499, "display": "zoonosis •", "acceptable": ["zoonosis"], "vocab": false}, {"uilNum": 1500, "display": "zygapophysis", "acceptable": ["zygapophysis"], "vocab": false}];
+
+let mode = "random";
+
+let currentRange = "all";
+
+let activePool = [...ALL_WORDS];
+
+let currentWord = null;
+
+let selectedVoice = null;
+
+let reviewQueue = [];
+
+let missedWords = [];
+
+let correct = 0;
+
+let incorrect = 0;
+
+let waitingForNextWord = false;
+
+
+function saveData(){
+
+    localStorage.setItem(
+        "uilStats",
+        JSON.stringify({
+            correct: correct,
+            incorrect: incorrect
+        })
+    );
+}
+
+
+function rebuildPool(){
+
+    let words = [...ALL_WORDS];
+
+    if(mode === "vocab"){
+
+        words =
+            words.filter(
+                w => w.vocab
+            );
+    }
+
+    if(mode === "missed"){
+
+        words = [...missedWords];
+    }
+
+    if(currentRange !== "all"){
+
+        const parts =
+            currentRange.split("-");
+
+        const start =
+            parseInt(parts[0]);
+
+        const end =
+            parseInt(parts[1]);
+
+        words =
+            words.filter(
+                w =>
+                    w.uilNum >= start &&
+                    w.uilNum <= end
+            );
+    }
+
+    activePool = words;
+
+    updateStats();
+}
+
+
+function setMode(m){
+
+    mode = m;
+
+    rebuildPool();
+}
+
+
+function applyRange(){
+
+    currentRange =
+        document.getElementById(
+            "rangeSelect"
+        ).value;
+
+    rebuildPool();
+}
+
+
+function updateStats(){
+
+    let total =
+        correct +
+        incorrect;
+
+    let pct =
+        total
+        ?
+        (
+            (correct / total) * 100
+        ).toFixed(1)
+        :
+        "0";
+
+    document.getElementById(
+        "stats"
+    ).innerText =
+
+        "Correct: " + correct +
+
+        " | Incorrect: " +
+        incorrect +
+
+        " | Accuracy: " +
+        pct + "%" +
+
+        " | Review Queue: " +
+        reviewQueue.length +
+
+        " | Missed Words: " +
+        missedWords.length +
+
+        " | Remaining: " +
+        activePool.length;
+}
+
+
+function chooseWord(){
+
+    if(
+        reviewQueue.length > 0 &&
+        Math.random() < 0.40
+    ){
+        return reviewQueue.shift();
+    }
+
+    if(
+        activePool.length === 0
+    ){
+        return null;
+    }
+
+    if(
+        mode === "sequential"
+    ){
+
+        return activePool.shift();
+    }
+
+    const i =
+        Math.floor(
+            Math.random()
+            *
+            activePool.length
+        );
+
+    return activePool.splice(
+        i,
+        1
+    )[0];
+}
+
+
+function nextWord(){
+
+    currentWord =
+        chooseWord();
+
+    if(!currentWord){
+
+        alert(
+            "Session Complete!"
+        );
+
+        return;
+    }
+
+    document.getElementById(
+        "wordNumber"
+    ).innerText =
+        "UIL Word #" +
+        currentWord.uilNum;
+
+    document.getElementById(
+        "vocabFlag"
+    ).innerText =
+        currentWord.vocab
+        ?
+        "Vocabulary Word"
+        :
+        "";
+
+    document.getElementById(
+        "spellInput"
+    ).value = "";
+
+    document.getElementById(
+        "result"
+    ).innerHTML = "";
+
+    lookupDefinition(
+        currentWord.acceptable[0]
+    );
+
+    waitingForNextWord = false;
+
+    repeatWord();
+
+    document.getElementById(
+        "spellInput"
+    ).focus();
+
+    updateStats();
+}
+
+
+function repeatWord(){
+
+    if(!currentWord){
+        return;
+    }
+
+    speechSynthesis.cancel();
+
+    let utter =
+        new SpeechSynthesisUtterance(
+            currentWord.acceptable[0]
+        );
+
+    if(selectedVoice){
+
+        utter.voice =
+            selectedVoice;
+    }
+
+    utter.rate = 0.85;
+
+    speechSynthesis.speak(
+        utter
+    );
+}
+
+
+async function lookupDefinition(word){
+
+    try{
+
+        const response =
+            await fetch(
+                "https://api.dictionaryapi.dev/api/v2/entries/en/"
+                +
+                encodeURIComponent(word)
+            );
+
+        const data =
+            await response.json();
+
+        if(
+            data[0] &&
+            data[0].meanings &&
+            data[0].meanings[0] &&
+            data[0].meanings[0].definitions
+        ){
+
+            document.getElementById(
+                "definition"
+            ).innerHTML =
+
+                "<b>Definition:</b><br>"
+                +
+                data[0]
+                .meanings[0]
+                .definitions[0]
+                .definition;
+
+        }else{
+
+            document.getElementById(
+                "definition"
+            ).innerHTML =
+
+                "<b>Definition:</b><br>No definition found.";
+        }
+
+    }catch{
+
+        document.getElementById(
+            "definition"
+        ).innerHTML =
+
+            "<b>Definition:</b><br>No definition found.";
+    }
+}
+
+
+function submitAnswer(){
+
+    if(
+        !currentWord
+    ){
+        return;
+    }
+
+    let answer =
+        document.getElementById(
+            "spellInput"
+        )
+        .value
+        .trim()
+        .toLowerCase();
+
+    let ok =
+        currentWord.acceptable.some(
+            v =>
+                v
+                .trim()
+                .toLowerCase()
+                ===
+                answer
+        );
+
+    if(ok){
+
+        correct++;
+
+        waitingForNextWord = true;
+
+        document.getElementById(
+            "result"
+        ).innerHTML =
+
+            "<span class='good'>✅ Correct</span>"
+            +
+            "<br><br>"
+            +
+            "<b>Press ENTER for next word</b>";
+
+    }else{
+
+        incorrect++;
+
+        missedWords.push(
+            currentWord
+        );
+
+        reviewQueue.push(
+            currentWord
+        );
+
+        waitingForNextWord = true;
+
+        document.getElementById(
+            "result"
+        ).innerHTML =
+
+            "<span class='bad'>❌ Correct spelling(s): "
+            +
+            currentWord.display
+            +
+            "</span>"
+            +
+            "<br><br>"
+            +
+            "<b>Press ENTER for next word</b>";
+    }
+    updateStats();
+
+    saveData();
+}
+
+
+function loadVoices(){
+
+    const voices =
+        speechSynthesis.getVoices();
+
+    const select =
+        document.getElementById(
+            "voiceSelect"
+        );
+
+    select.innerHTML = "";
+
+    voices.forEach(v=>{
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value = v.name;
+
+        option.textContent =
+            v.name;
+
+        select.appendChild(
+            option
+        );
+
+    });
+
+    selectedVoice =
+
+        voices.find(
+            v =>
+            v.name.includes(
+                "Google US English"
+            )
+        )
+        voices.find(
+            v =>
+            v.name.includes(
+                "Ava"
+            )
+        )
+        ||
+        voices.find(
+            v =>
+            v.name.includes(
+                "Aria"
+            )
+        )
+        ||
+        voices.find(
+            v =>
+            v.name.includes(
+                "Jenny"
+            )
+        )
+        ||
+        voices.find(
+            v =>
+            v.name.includes(
+                "Guy"
+            )
+        )
+        ||
+        voices[0];
+
+    if(selectedVoice){
+
+        select.value =
+            selectedVoice.name;
+    }
+
+    select.onchange = ()=>{
+
+        selectedVoice =
+            voices.find(
+                v =>
+                v.name ===
+                select.value
+            );
+    };
+}
+
+
+speechSynthesis
+.onvoiceschanged =
+loadVoices;
+
+loadVoices();
+
+
+document
+.getElementById(
+    "spellInput"
+)
+.addEventListener(
+    "keydown",
+    e => {
+
+        if(
+            e.key !== "Enter"
+        ){
+            return;
+        }
+
+        if(
+            waitingForNextWord
+        ){
+
+            waitingForNextWord =
+                false;
+
+            nextWord();
+
+            return;
+        }
+
+        submitAnswer();
+
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    e => {
+
+        const typing =
+            document.activeElement.id
+            ===
+            "spellInput";
+
+        if(
+            typing &&
+            e.key !== "Enter"
+        ){
+            return;
+        }
+
+        if(
+            e.key ===
+            "ArrowRight"
+        ){
+            nextWord();
+        }
+
+        if(
+            e.key ===
+            "ArrowLeft"
+        ){
+            repeatWord();
+        }
+
+    }
+);
+
+
+updateStats();
+
+</script>
+
+</body>
+
+</html>
+
