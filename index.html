@@ -299,6 +299,23 @@ let incorrect = 0;
 
 let waitingForNextWord = false;
 
+let speechUnlocked = false;
+
+function unlockSpeech(){
+
+    if(speechUnlocked){
+        return;
+    }
+
+    speechUnlocked = true;
+
+    const u =
+        new SpeechSynthesisUtterance(" ");
+
+    speechSynthesis.speak(u);
+
+    speechSynthesis.cancel();
+}
 
 function saveData(){
 
@@ -449,6 +466,8 @@ function chooseWord(){
 
 function nextWord(){
 
+    unlockSpeech();
+
     currentWord =
         chooseWord();
 
@@ -502,6 +521,8 @@ function nextWord(){
 
 function repeatWord(){
 
+    unlockSpeech();
+
     if(!currentWord){
         return;
     }
@@ -513,13 +534,35 @@ function repeatWord(){
             currentWord.acceptable[0]
         );
 
-    if(selectedVoice){
+    const voices =
+        speechSynthesis.getVoices();
 
-        utter.voice =
-            selectedVoice;
+    const selectedName =
+        document.getElementById(
+            "voiceSelect"
+        ).value;
+
+    const voice =
+        voices.find(
+            v => v.name === selectedName
+        );
+
+    if(voice){
+        utter.voice = voice;
     }
 
     utter.rate = 0.85;
+
+    utter.onstart = () => {
+        console.log("Speech started");
+    };
+
+    utter.onerror = e => {
+        console.log(
+            "Speech error:",
+            e
+        );
+    };
 
     speechSynthesis.speak(
         utter
